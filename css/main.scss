@@ -1,0 +1,19 @@
+@import './view.scss';
+@import './control.scss';
+
+$palet : ('primary': blue,
+    'font-color': black,
+    'body-bg': beige
+
+);
+
+*{
+    box-sizing: border-box;
+    padding: 0;
+    margin: 0;
+}
+
+body{
+    background: map-get($map: $palet, $key: body-bg);
+    color: map-get($map: $palet, $key: font-color);
+}
