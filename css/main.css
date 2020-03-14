@@ -1,3 +1,30 @@
+.player {
+  display: -ms-grid;
+  display: grid;
+  gap: .5rem;
+  -ms-grid-columns: (minmax(125px, 1fr))[auto-fit];
+      grid-template-columns: repeat(auto-fit, minmax(125px, 1fr));
+  padding: 1rem;
+}
+
+.player-item {
+  color: black;
+  text-align: center;
+  padding: 1rem;
+}
+
+.player-item.active {
+  border: solid .25rem none;
+  border-radius: 15px;
+  background-color: white;
+}
+
+.view canvas {
+  height: 100%;
+  width: 100%;
+  border: solid 1px black;
+}
+
 * {
   -webkit-box-sizing: border-box;
           box-sizing: border-box;
@@ -8,5 +35,62 @@
 body {
   background: beige;
   color: black;
+}
+
+.banner {
+  height: 100%;
+  width: 100%;
+  display: -ms-grid;
+  display: grid;
+  background: url("../resources/bg.jpg") center top;
+  background-size: cover;
+  color: black;
+  -webkit-text-emphasis: 600;
+          text-emphasis: 600;
+  text-align: center;
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+}
+
+.banner-name {
+  padding-bottom: 2vh;
+  padding-top: 2vh;
+  border: .25rem solid none;
+  border-radius: 15px;
+  background-color: beige;
+  margin-left: 5rem;
+  margin-right: 5rem;
+  margin-top: 25%;
+  margin-bottom: 25%;
+  font-size: 25px;
+}
+
+.banner-name .author {
+  font-size: 25%;
+}
+
+.banner-up {
+  -webkit-box-align: center;
+      -ms-flex-align: center;
+          align-items: center;
+  padding: 0.25rem;
+  color: beige;
+}
+
+.banner-up i:hover {
+  -webkit-transform: translateY(-20%);
+          transform: translateY(-20%);
+  -webkit-transition: all 1s ease-in-out;
+  transition: all 1s ease-in-out;
+  color: #39e600;
+}
+
+.banner.close {
+  all: initial;
+}
+
+.banner.close * {
+  all: unset;
 }
 /*# sourceMappingURL=main.css.map */

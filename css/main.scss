@@ -3,6 +3,7 @@
 
 $palet : ('primary': blue,
     'font-color': black,
+    'title-color': black,
     'body-bg': beige
 
 );
@@ -16,4 +17,49 @@ $palet : ('primary': blue,
 body{
     background: map-get($map: $palet, $key: body-bg);
     color: map-get($map: $palet, $key: font-color);
+}
+
+.banner{
+    height: 100%;
+    width: 100%;
+    display: grid;
+    background: url('../resources/bg.jpg') center top;
+    background-size: cover;
+    color: map-get($palet, title-color);
+    text-emphasis: 600;
+    text-align: center;
+    align-items: center;
+    &-name{
+        padding-bottom: 2vh;
+        padding-top: 2vh;
+        border: .25rem solid none;
+        border-radius: 15px;
+        background-color: map-get($palet, body-bg);
+        margin-left: 5rem;
+        margin-right: 5rem;
+        margin-top: 25%;
+        margin-bottom: 25%;
+        font-size: 25px;
+        .author{
+            font-size: 25%;
+        }
+    }
+
+    &-up{
+        align-items: center;
+        padding: 0.25rem;
+        color: map-get($palet, body-bg);
+
+        i:hover{
+            transform: translateY(-20%);
+            transition: all 1s ease-in-out;
+            color: #39e600;
+        }
+    }
+    &.close{
+        all: initial;
+        *{
+            all:unset;
+        }
+    }
 }
