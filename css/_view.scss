@@ -16,13 +16,9 @@
 }
 
 .view{
-    // display: flex;
-
+    text-align: center;
     canvas{
-        // justify-content: center;
-        // align-items: center;
-        height: 100%;
-        width: 100%;
+        display: inline;
         border: solid 1px black;
     }
 }

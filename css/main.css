@@ -19,9 +19,12 @@
   background-color: white;
 }
 
+.view {
+  text-align: center;
+}
+
 .view canvas {
-  height: 100%;
-  width: 100%;
+  display: inline;
   border: solid 1px black;
 }
 
