@@ -65,7 +65,7 @@ body {
   margin-left: 5rem;
   margin-right: 5rem;
   margin-top: 25%;
-  margin-bottom: 25%;
+  margin-bottom: 15%;
   font-size: 25px;
 }
 
@@ -73,11 +73,17 @@ body {
   font-size: 25%;
 }
 
+.banner-name.close {
+  visibility: hidden;
+  padding: 0;
+  margin: 0;
+}
+
 .banner-up {
   -webkit-box-align: center;
       -ms-flex-align: center;
           align-items: center;
-  padding: 0.25rem;
+  padding: 1.25rem;
   color: beige;
 }
 
@@ -87,13 +93,5 @@ body {
   -webkit-transition: all 1s ease-in-out;
   transition: all 1s ease-in-out;
   color: #39e600;
-}
-
-.banner.close {
-  all: initial;
-}
-
-.banner.close * {
-  all: unset;
 }
 /*# sourceMappingURL=main.css.map */
