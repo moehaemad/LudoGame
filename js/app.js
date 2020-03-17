@@ -17,9 +17,16 @@ class Board{
         this.x = xunit;
         this.y = yunit;
         this.ctx = ctx;
+        this.startCord = {
+            //each are coordinates for the colored paths
+            greenStart: [1*this.x,6*this.y],
+            redStart: [8*this.x,1*this.y],
+            blueStart: [13*this.x,8*this.y],
+            yellowStart: [6*this.x,13*this.y]
+        };
     }
 
-    makeRectangle(color, x, y, width, height){
+    makeRectangle(color, x, y, width = this.x, height = this.y){
         this.ctx.strokeStyle = 'black';
         this.ctx.lineWidth = 2;
         this.ctx.fillStyle = color;
@@ -28,6 +35,8 @@ class Board{
     }
 
     makePath(x, y, iterations, incDirec, color = 'white'){
+        x = this.x * x;
+        y = this.y * y;
         for (let i = 0; i <= iterations; i++){
             if (incDirec == 'vertical'){
                 this.makeRectangle(color, x, y + (this.y*i), this.x, this.y)
@@ -56,18 +65,30 @@ class Board{
         this.makeRectangle('#4d4d00', 9*this.x, 9*this.y, bigX, bigY);
         this.makeRectangle('pink', 2*homeX, 2*homeY, homeX, homeY);
         // Draw all vertical paths
-        this.makePath(this.x*6, 0, 5, 'vertical');
-        this.makePath(this.x*7, 0, 5, 'vertical');
-        this.makePath(this.x*8, 0, 5, 'vertical');
-        this.makePath(this.x*6, this.y*9, 5, 'vertical');
-        this.makePath(this.x*7, this.y*9, 5, 'vertical');
-        this.makePath(this.x*8, this.y*9, 5, 'vertical');
-        this.makePath(0, this.y*6, 5, 'horizontal');
-        this.makePath(0, this.y*7, 5, 'horizontal');
-        this.makePath(0, this.y*8, 5, 'horizontal');
-        this.makePath(this.x*9, this.y*6, 5, 'horizontal');
-        this.makePath(this.x*9, this.y*7, 5, 'horizontal');
-        this.makePath(this.x*9, this.y*8, 5, 'horizontal');
+        this.makePath(6, 0, 5, 'vertical');
+        this.makePath(7, 0, 5, 'vertical');
+        this.makePath(8, 0, 5, 'vertical');
+        this.makePath(6, 9, 5, 'vertical');
+        this.makePath(7, 9, 5, 'vertical');
+        this.makePath(8, 9, 5, 'vertical');
+        this.makePath(0, 6, 5, 'horizontal');
+        this.makePath(0, 7, 5, 'horizontal');
+        this.makePath(0, 8, 5, 'horizontal');
+        this.makePath(9, 6, 5, 'horizontal');
+        this.makePath(9, 7, 5, 'horizontal');
+        this.makePath(9, 8, 5, 'horizontal');
+        //Draw colored paths
+        console.log(this.startCord.greenStart);
+        this.makeRectangle('green', this.startCord.greenStart[0], this.startCord.greenStart[1]);
+        this.makePath(1, 7, 4, 'horizontal', 'green');
+        this.makeRectangle('red', this.startCord.redStart[0], this.startCord.redStart[1]);
+        this.makePath(7, 1, 4, 'vertical', 'red');
+        this.makeRectangle('blue', this.startCord.blueStart[0], this.startCord.blueStart[1]);
+        this.makePath(9, 7, 4, 'horizontal', 'blue');
+        this.makeRectangle('yellow', this.startCord.yellowStart[0], this.startCord.yellowStart[1]);
+        this.makePath(7, 9, 4, 'vertical', 'yellow');
+        
+
     }
 
     clearScreen(){
