@@ -2,6 +2,8 @@ class UI{
     constructor(){
         let DOMItems = {
             toggleBanner: '.banner-up',
+            banner: '.banner',
+            bannerName: '.banner-name',
             game: '.gameScreen'
         }
         this.DOMItems = DOMItems;
@@ -18,7 +20,7 @@ class Board{
         this.y = yunit;
         this.ctx = ctx;
         this.startCord = {
-            //each are coordinates for the colored paths
+            //each are coordinates of the starting coordinates for each piece
             greenStart: [1*this.x,6*this.y],
             redStart: [8*this.x,1*this.y],
             blueStart: [13*this.x,8*this.y],
@@ -27,6 +29,7 @@ class Board{
     }
 
     makeRectangle(color, x, y, width = this.x, height = this.y){
+        //Make a rectangle with a black border
         this.ctx.strokeStyle = 'black';
         this.ctx.lineWidth = 2;
         this.ctx.fillStyle = color;
@@ -35,6 +38,7 @@ class Board{
     }
 
     makePath(x, y, iterations, incDirec, color = 'white'){
+        //Adjust the given x, y coordinates to the 15x15 matrix.
         x = this.x * x;
         y = this.y * y;
         for (let i = 0; i <= iterations; i++){
@@ -55,10 +59,10 @@ class Board{
         //Make unit calc easier for home square.
         const [homeX, homeY] = [this.x*3, this.y*3];
         //TODO: eventually add in image for home
-        let homeImg = new Image();
-        homeImg.src = './resources/piece.png';
-        console.log(homeImg);
-        console.log(this.ctx.drawImage(homeImg, 0, 0));
+        // let homeImg = new Image();
+        // homeImg.src = './resources/piece.png';
+        // console.log(homeImg);
+        // console.log(this.ctx.drawImage(homeImg, 0, 0));
         this.makeRectangle('#004d1a', 0, 0, bigX, bigY);
         this.makeRectangle('#4d0f00', 9*this.x, 0, bigX, bigY);
         this.makeRectangle('#00004d', 0, 9*this.y, bigX, bigY);
@@ -78,15 +82,14 @@ class Board{
         this.makePath(9, 7, 5, 'horizontal');
         this.makePath(9, 8, 5, 'horizontal');
         //Draw colored paths
-        console.log(this.startCord.greenStart);
         this.makeRectangle('green', this.startCord.greenStart[0], this.startCord.greenStart[1]);
         this.makePath(1, 7, 4, 'horizontal', 'green');
         this.makeRectangle('red', this.startCord.redStart[0], this.startCord.redStart[1]);
         this.makePath(7, 1, 4, 'vertical', 'red');
-        this.makeRectangle('blue', this.startCord.blueStart[0], this.startCord.blueStart[1]);
-        this.makePath(9, 7, 4, 'horizontal', 'blue');
-        this.makeRectangle('yellow', this.startCord.yellowStart[0], this.startCord.yellowStart[1]);
-        this.makePath(7, 9, 4, 'vertical', 'yellow');
+        this.makeRectangle('yellow', this.startCord.blueStart[0], this.startCord.blueStart[1]);
+        this.makePath(9, 7, 4, 'horizontal', 'yellow');
+        this.makeRectangle('blue', this.startCord.yellowStart[0], this.startCord.yellowStart[1]);
+        this.makePath(7, 9, 4, 'vertical', 'blue');
         
 
     }
@@ -114,11 +117,25 @@ class MainController{
         return [xUnit, yUnit];
     }
 
+    setupEventListeners(){
+        const domItems = this.uiCtl.DOMItems;
+        document.querySelector(domItems.banner).addEventListener('click', e => {
+            // let bannerNode = e.target.parentNode.parentNode;
+            // //This is the "Ludo by Muhammad Ali" text
+            // let textNode = bannerNode.childNodes[1];
+            // let iconNode = bannerNode.childNodes[3]
+            // bannerNode.removeChild(textNode);
+            document.querySelector(domItems.bannerName).classList.toggle('close');
+        });
+
+    }
+
     init(){
         this.uiCtl = new UI();
         const [dx, dy] = this.setupCanvas();
         this.boardCtl = new Board(dx, dy, this.ctx);
         this.boardCtl.setupBoard();
+        this.setupEventListeners();
         // console.log(`${dx} + ${dy}`);
     }
 }
