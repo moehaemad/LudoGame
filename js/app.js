@@ -4,13 +4,24 @@ class UI{
             toggleBanner: '.banner-up',
             banner: '.banner',
             bannerName: '.banner-name',
-            game: '.gameScreen'
+            game: '.gameScreen',
+            dice: '.control-dice',
+            green: '.green',
+            red: '.red',
+            yellow: '.yellow',
+            blue: '.blue',
+            pieces: 'num-pieces'
         }
         this.DOMItems = DOMItems;
     }
 
     getCanvas(){
         return document.querySelector(this.DOMItems.game);
+    }
+
+    reducePieces(x){
+        const dom = document.getElementById(this.DOMItems.pieces);
+        x <= 0? dom.textContent = "0": dom.textContent = x.toString(); 
     }
 }
 
@@ -26,6 +37,12 @@ class Board{
             blueStart: [13*this.x,8*this.y],
             yellowStart: [6*this.x,13*this.y]
         };
+        //Number of starting pieces for each player on the board
+        this.pieces = 4;
+    }
+    //TODO: add the piece to the board
+    makePiece(color, x, y, width = this.x, height = this.y){
+        return 0;
     }
 
     makeRectangle(color, x, y, width = this.x, height = this.y){
@@ -103,6 +120,18 @@ class Board{
 
 class MainController{
 
+    constructor(){
+        this.uiCtl = new UI();
+        const [dx, dy] = this.setupCanvas();
+        this.boardCtl = new Board(dx, dy, this.ctx);
+        this.pieces = parseInt(document.getElementById('num-pieces').textContent);
+    }
+
+    addPlayer(){
+        //TODO: Decrease the number of pieces
+        return 0;
+    }
+
     setupCanvas(){
         const canvas = this.uiCtl.getCanvas()
         //Make Canvas resizeable
@@ -127,13 +156,29 @@ class MainController{
             // bannerNode.removeChild(textNode);
             document.querySelector(domItems.bannerName).classList.toggle('close');
         });
+        document.querySelector(domItems.dice).addEventListener('click', e =>{
+            const numWord = ['one', 'two', 'three', 'four', 'five', 'six'];
+            let roll = Math.round(Math.random()*5);
+            let icon = `<i class="fas fa-dice-${numWord[roll]} fa-4x"></i>`;
+            document.querySelector(domItems.dice).innerHTML = icon
+            this.pieces -= 1;
+            this.uiCtl.reducePieces(this.pieces);
+
+            if (roll === 6){
+                console.log(`Player rolled a six, update a piece`);
+                this.addPlayer();
+            }
+        })
+
+        //REDUCE SINCE THIS IS REPETITIVE
+        document.querySelector(domItems.green).addEventListener('click', () => document.querySelector(domItems.green).classList.toggle('active'));
+        document.querySelector(domItems.red).addEventListener('click', () => document.querySelector(domItems.red).classList.toggle('active'));
+        document.querySelector(domItems.yellow).addEventListener('click', () => document.querySelector(domItems.yellow).classList.toggle('active'));
+        document.querySelector(domItems.blue).addEventListener('click', () => document.querySelector(domItems.blue).classList.toggle('active'));
 
     }
 
     init(){
-        this.uiCtl = new UI();
-        const [dx, dy] = this.setupCanvas();
-        this.boardCtl = new Board(dx, dy, this.ctx);
         this.boardCtl.setupBoard();
         this.setupEventListeners();
         // console.log(`${dx} + ${dy}`);
