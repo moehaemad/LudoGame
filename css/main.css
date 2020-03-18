@@ -19,6 +19,22 @@
   background-color: white;
 }
 
+.player-item.green i {
+  color: green;
+}
+
+.player-item.red i {
+  color: red;
+}
+
+.player-item.yellow i {
+  color: yellow;
+}
+
+.player-item.blue i {
+  color: blue;
+}
+
 .view {
   text-align: center;
 }
@@ -34,6 +50,8 @@
   -ms-grid-columns: (minmax(120px, 1fr))[auto-fit];
       grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   justify-items: center;
+  margin-right: 1rem;
+  margin-left: 1rem;
   padding-bottom: 1rem;
 }
 
@@ -53,6 +71,8 @@
   -ms-flex-item-align: center;
       -ms-grid-row-align: center;
       align-self: center;
+  color: black;
+  background-color: white;
 }
 
 .control-pieces {

@@ -8,6 +8,8 @@
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
     justify-items: center;
+    margin-right: 1rem;
+    margin-left: 1rem;
     // align-items: center;
     padding-bottom: 1rem;
     &-info{
@@ -17,6 +19,8 @@
     &-dice{
         @include borderize();
         align-self: center;
+        color: black;
+        background-color: white;
     }
     &-pieces{
         @include borderize();
