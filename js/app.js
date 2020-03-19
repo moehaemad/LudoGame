@@ -40,9 +40,21 @@ class Board{
         //Number of starting pieces for each player on the board
         this.pieces = 4;
     }
-    //TODO: add the piece to the board
-    makePiece(color, x, y, width = this.x, height = this.y){
-        return 0;
+
+    makePiece(color, x, y){
+        //This is the x and y coordinate
+        x = this.x * x;
+        y = this.y * y;
+        //This is the width and height of each tile
+        const width = Math.ceil(this.x/2);
+        const height = Math.ceil(this.y/2);
+        //In case of disproportionate window size, adjust radius for the one board tile to be the smaller
+            //so that it doesn't draw too large of a circle.
+        const circleRad = width < height ? width : height;
+        this.ctx.fillStyle = color;
+        this.ctx.beginPath();
+        this.ctx.arc(x, y, circleRad, 0, 2*Math.PI);
+        this.ctx.fill();
     }
 
     makeRectangle(color, x, y, width = this.x, height = this.y){
@@ -107,8 +119,46 @@ class Board{
         this.makePath(9, 7, 4, 'horizontal', 'yellow');
         this.makeRectangle('blue', this.startCord.yellowStart[0], this.startCord.yellowStart[1]);
         this.makePath(7, 9, 4, 'vertical', 'blue');
-        
+        //Draw Pieces
+            //Green pieces
+                //top-left
+        this.makePiece('#39e600', 1, 1);
+                //bottom-left
+        this.makePiece('#39e600', 1, 4);
+                //top-right
+        this.makePiece('#39e600', 4, 1);
+                //bottom-right
+        this.makePiece('#39e600', 4, 4);
 
+            //Red Pieces
+                //top-left
+        this.makePiece('#e60000', 9 + 1, 1);
+                //bottom-left
+        this.makePiece('#e60000', 9 + 1, 4);
+                //top-right
+        this.makePiece('#e60000', 9 + 1 + 4, 1);
+                //bottom-right
+        this.makePiece('#e60000', 9 + 1 + 4, 4);
+
+            //Yellow Pieces
+                //top-left
+        this.makePiece('#e6e600', 9 + 1, 9 + 1);
+                //bottom-left
+        this.makePiece('#e6e600', 9 + 1, 9 + 1 + 4);
+                //top-right
+        this.makePiece('#e6e600', 9 + 1 + 4, 9 + 1);
+                //bottom-right
+        this.makePiece('#e6e600', 9 + 1 + 4, 9 + 1 + 4);
+
+            //Blue pieces
+                //top-left
+        this.makePiece('#0000e6', 1, 9 + 1);
+                //bottom-left
+        this.makePiece('#0000e6', 1, 9 + 1 + 4);
+                //top-right
+        this.makePiece('#0000e6', 4, 9 + 1);
+                //bottom-right
+        this.makePiece('#0000e6', 4, 9 + 1 + 4);
     }
 
     clearScreen(){
@@ -128,7 +178,14 @@ class MainController{
     }
 
     addPlayer(){
-        //TODO: Decrease the number of pieces
+        //Check if no pieces are on board
+            //If none -> add onto board
+            //If 1 >= pieces >= 3  ask player to add a piece onto the board or move pieces on board
+            //If 6 ask player to move piece on board
+
+        //Decrease the number of pieces
+        this.pieces -=1;
+        this.uiCtl.reducePieces(this.pieces);
         return 0;
     }
 
@@ -148,6 +205,7 @@ class MainController{
 
     setupEventListeners(){
         const domItems = this.uiCtl.DOMItems;
+        //Close Banner
         document.querySelector(domItems.banner).addEventListener('click', e => {
             // let bannerNode = e.target.parentNode.parentNode;
             // //This is the "Ludo by Muhammad Ali" text
@@ -156,20 +214,18 @@ class MainController{
             // bannerNode.removeChild(textNode);
             document.querySelector(domItems.bannerName).classList.toggle('close');
         });
+        //Roll Dice and add player if dice 6
         document.querySelector(domItems.dice).addEventListener('click', e =>{
             const numWord = ['one', 'two', 'three', 'four', 'five', 'six'];
             let roll = Math.round(Math.random()*5);
             let icon = `<i class="fas fa-dice-${numWord[roll]} fa-4x"></i>`;
             document.querySelector(domItems.dice).innerHTML = icon
-            this.pieces -= 1;
-            this.uiCtl.reducePieces(this.pieces);
-
             if (roll === 6){
                 console.log(`Player rolled a six, update a piece`);
                 this.addPlayer();
             }
         })
-
+        //Highlight the active player color
         //REDUCE SINCE THIS IS REPETITIVE
         document.querySelector(domItems.green).addEventListener('click', () => document.querySelector(domItems.green).classList.toggle('active'));
         document.querySelector(domItems.red).addEventListener('click', () => document.querySelector(domItems.red).classList.toggle('active'));
@@ -181,7 +237,6 @@ class MainController{
     init(){
         this.boardCtl.setupBoard();
         this.setupEventListeners();
-        // console.log(`${dx} + ${dy}`);
     }
 }
 
