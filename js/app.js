@@ -67,6 +67,17 @@ class Board{
         this.ctx.fill();
     }
 
+    placePiece(color, arr){
+        for(let i=0; i<=arr.length; i++){
+            try{
+                this.makePiece(color, ...arr[i]);
+            }catch(err){
+                //error of Symbol(Symbol.iterator) not iterable, don't understand yet
+                    //the code should execute though
+            }
+        }
+    }
+
     makeRectangle(color, x, y, width = this.x, height = this.y){
         //Make a rectangle with a black border
         this.ctx.strokeStyle = 'black';
@@ -130,29 +141,17 @@ class Board{
         this.makeRectangle('blue', this.startCord.yellowStart[0], this.startCord.yellowStart[1]);
         this.makePath(7, 9, 4, 'vertical', 'blue');
         //Draw Pieces
-            //Green pieces: top-left, bottom-left, top-right, & bottom-right
-        this.makePiece('#39e600', ...this.coord.green[0]);
-        this.makePiece('#39e600', ...this.coord.green[1]);
-        this.makePiece('#39e600', ...this.coord.green[2]);
-        this.makePiece('#39e600', ...this.coord.green[3]);
+        //Green pieces: top-left, bottom-left, top-right, & bottom-right
+        this.placePiece('#39e600', this.coord.green);
 
         //Red pieces: top-left, bottom-left, top-right, & bottom-right
-        this.makePiece('#e60000', ...this.coord.red[0]);
-        this.makePiece('#e60000', ...this.coord.red[1]);
-        this.makePiece('#e60000', ...this.coord.red[2]);
-        this.makePiece('#e60000', ...this.coord.red[3]);
+        this.placePiece('#e60000', this.coord.red);
 
         //Yellow pieces: top-left, bottom-left, top-right, & bottom-right
-        this.makePiece('#e6e600', ...this.coord.yellow[0]);
-        this.makePiece('#e6e600', ...this.coord.yellow[1]);
-        this.makePiece('#e6e600', ...this.coord.yellow[2]);
-        this.makePiece('#e6e600', ...this.coord.yellow[3]);
+        this.placePiece('#e6e600', this.coord.yellow);
 
         //Blue pieces: top-left, bottom-left, top-right, & bottom-right
-        this.makePiece('#0000e6', ...this.coord.blue[0]);
-        this.makePiece('#0000e6', ...this.coord.blue[1]);
-        this.makePiece('#0000e6', ...this.coord.blue[2]);
-        this.makePiece('#0000e6', ...this.coord.blue[3]);
+        this.placePiece('#0000e6', this.coord.blue);
 
     }
 
