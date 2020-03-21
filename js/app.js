@@ -30,7 +30,7 @@ class Board{
         this.x = xunit;
         this.y = yunit;
         this.ctx = ctx;
-        this.startCord = {
+        this.startCoord = {
             //each are coordinates of the starting coordinates for each piece
             greenStart: [1, 6],
             redStart: [8, 1],
@@ -47,8 +47,6 @@ class Board{
         this.redInactive = [[9+1, 1], [9+1, 4], [9+1+4, 1], [9+1+4, 4]];
         this.yellowInactive = [[9+1, 9+1], [9+1, 9+1+4], [9+1+4, 9+1], [9+1+4, 9+1+4]];
         this.blueInactive = [[1, 9+1], [1, 9+1+4], [4, 9+1], [4, 9+1+4]];
-        //Number of starting pieces for each player on the board
-        this.pieces = 4;
     }
 
     makePiece(color, x, y){
@@ -103,6 +101,9 @@ class Board{
     }
 
     setupBoard(){
+        //clear the screen in case of previous drawings
+        this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        //Clear screen in case of any previous drawings
         //All main boxes for not playing players is a 6 unti square.
         const bigX = this.x*6;
         const bigY = this.y*6;
@@ -132,13 +133,13 @@ class Board{
             }
         }
         //Draw colored paths
-        this.makeRectangle('green', this.startCord.greenStart[0], this.startCord.greenStart[1]);
+        this.makeRectangle('green', this.startCoord.greenStart[0], this.startCoord.greenStart[1]);
         this.makePath(1, 7, 4, 'horizontal', 'green');
-        this.makeRectangle('red', this.startCord.redStart[0], this.startCord.redStart[1]);
+        this.makeRectangle('red', this.startCoord.redStart[0], this.startCoord.redStart[1]);
         this.makePath(7, 1, 4, 'vertical', 'red');
-        this.makeRectangle('yellow', this.startCord.blueStart[0], this.startCord.blueStart[1]);
+        this.makeRectangle('yellow', this.startCoord.blueStart[0], this.startCoord.blueStart[1]);
         this.makePath(9, 7, 4, 'horizontal', 'yellow');
-        this.makeRectangle('blue', this.startCord.yellowStart[0], this.startCord.yellowStart[1]);
+        this.makeRectangle('blue', this.startCoord.yellowStart[0], this.startCoord.yellowStart[1]);
         this.makePath(7, 9, 4, 'vertical', 'blue');
         //Draw Pieces
         //Green pieces: top-left, bottom-left, top-right, & bottom-right
@@ -153,11 +154,6 @@ class Board{
         //Blue pieces: top-left, bottom-left, top-right, & bottom-right
         this.placePiece('#0000e6', this.coord.blue);
 
-    }
-
-    clearScreen(){
-        this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        this.setupBoard();
     }
 
 }
@@ -177,13 +173,13 @@ class MainController{
             //If 1 >= pieces >= 3  ask player to add a piece onto the board or move pieces on board
             //If 6 ask player to move piece on board
 
-        //Decrease the number of pieces
+        //Decrease the number of pieces from UI
         this.pieces -=1;
         this.uiCtl.reducePieces(this.pieces);
         //Draw the board with a piece on the starting line
-        startCoord = this.uiCtl.startCoord.greenStart;
-        this.uiCtl.green
-        return 0;
+        let startCoord = this.boardCtl.startCoord.greenStart;
+        this.boardCtl.coord.green[this.pieces] = startCoord;
+        this.boardCtl.setupBoard();
     }
 
     setupCanvas(){
@@ -217,10 +213,11 @@ class MainController{
             let roll = Math.round(Math.random()*5);
             let icon = `<i class="fas fa-dice-${numWord[roll]} fa-4x"></i>`;
             document.querySelector(domItems.dice).innerHTML = icon
-            if (roll === 6){
-                console.log(`Player rolled a six, update a piece`);
-                this.addPlayer();
-            }
+            this.addPlayer();
+            // if (roll === 6 -1){
+            //     console.log(`Player rolled a six, update a piece`);
+            //     this.addPlayer();
+            // }
         })
         //Highlight the active player color
         //REDUCE SINCE THIS IS REPETITIVE
@@ -237,7 +234,6 @@ class MainController{
     // }
 
     init(){
-        // setInterval(this.anim, 500)
         this.boardCtl.setupBoard();
         this.setupEventListeners();
     }
