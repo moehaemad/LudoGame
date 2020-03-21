@@ -32,10 +32,10 @@ class Board{
         this.ctx = ctx;
         this.startCord = {
             //each are coordinates of the starting coordinates for each piece
-            greenStart: [this.x*1, this.y*6],
-            redStart: [this.x*8, this.y*1],
-            blueStart: [this.x*13, this.y*8],
-            yellowStart: [this.x*6, this.y*13]
+            greenStart: [1, 6],
+            redStart: [8, 1],
+            blueStart: [13, 8],
+            yellowStart: [6, 13]
         };
         this.coord = {
             green: [[1, 1], [1, 4], [4, 1], [4, 4]],
@@ -79,6 +79,8 @@ class Board{
     }
 
     makeRectangle(color, x, y, width = this.x, height = this.y){
+        x = this.x*x;
+        y = this.y*y;
         //Make a rectangle with a black border
         this.ctx.strokeStyle = 'black';
         this.ctx.lineWidth = 2;
@@ -89,14 +91,12 @@ class Board{
 
     makePath(x, y, iterations, incDirec, color = 'white'){
         //Adjust the given x, y coordinates to the 15x15 matrix.
-        x = this.x * x;
-        y = this.y * y;
         for (let i = 0; i <= iterations; i++){
             if (incDirec == 'vertical'){
-                this.makeRectangle(color, x, y + (this.y*i), this.x, this.y)
+                this.makeRectangle(color, x, y + i, this.x, this.y)
             }
             if (incDirec === 'horizontal'){
-                this.makeRectangle(color, x + (this.x * i), y, this.x, this.y);
+                this.makeRectangle(color, x + i, y, this.x, this.y);
             }
         }
 
@@ -106,14 +106,14 @@ class Board{
         //All main boxes for not playing players is a 6 unti square.
         const bigX = this.x*6;
         const bigY = this.y*6;
-        //Make unit calc easier for home square.
-        const [homeX, homeY] = [this.x*3, this.y*3];
+        //Make unit calc easier for home square and easier to understand when debugging later.
+        const [homeX, homeY] = [3, 3];
         //TODO: eventually add in image for home
         this.makeRectangle('#004d1a', 0, 0, bigX, bigY);
-        this.makeRectangle('#4d0f00', 9*this.x, 0, bigX, bigY);
-        this.makeRectangle('#00004d', 0, 9*this.y, bigX, bigY);
-        this.makeRectangle('#4d4d00', 9*this.x, 9*this.y, bigX, bigY);
-        this.makeRectangle('pink', 2*homeX, 2*homeY, homeX, homeY);
+        this.makeRectangle('#4d0f00', 9, 0, bigX, bigY);
+        this.makeRectangle('#00004d', 0, 9, bigX, bigY);
+        this.makeRectangle('#4d4d00', 9, 9, bigX, bigY);
+        this.makeRectangle('pink', 2*homeX, 2*homeY, this.x*homeX, this.y*homeY);
         // Draw all vertical paths
             //The arrays are coordinates for all the paths going from left->right (vertical) and top->bottom (horizontal)
         const verticalPaths = [[6, 0, 5], [7, 0, 5], [8, 0, 5], [6, 9, 5], [7, 9, 5], [8, 9, 5]];
@@ -180,6 +180,9 @@ class MainController{
         //Decrease the number of pieces
         this.pieces -=1;
         this.uiCtl.reducePieces(this.pieces);
+        //Draw the board with a piece on the starting line
+        startCoord = this.uiCtl.startCoord.greenStart;
+        this.uiCtl.green
         return 0;
     }
 
@@ -228,7 +231,13 @@ class MainController{
 
     }
 
+    // anim(){
+    //     //Draw the board
+    //     this.boardCtl.setupBoard();
+    // }
+
     init(){
+        // setInterval(this.anim, 500)
         this.boardCtl.setupBoard();
         this.setupEventListeners();
     }
