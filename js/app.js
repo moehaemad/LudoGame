@@ -32,11 +32,21 @@ class Board{
         this.ctx = ctx;
         this.startCord = {
             //each are coordinates of the starting coordinates for each piece
-            greenStart: [1*this.x,6*this.y],
-            redStart: [8*this.x,1*this.y],
-            blueStart: [13*this.x,8*this.y],
-            yellowStart: [6*this.x,13*this.y]
+            greenStart: [this.x*1, this.y*6],
+            redStart: [this.x*8, this.y*1],
+            blueStart: [this.x*13, this.y*8],
+            yellowStart: [this.x*6, this.y*13]
         };
+        this.coord = {
+            green: [[1, 1], [1, 4], [4, 1], [4, 4]],
+            red: [[9+1, 1], [9+1, 4], [9+1+4, 1], [9+1+4, 4]],
+            yellow: [[9+1, 9+1], [9+1, 9+1+4], [9+1+4, 9+1], [9+1+4, 9+1+4]],
+            blue: [[1, 9+1], [1, 9+1+4], [4, 9+1], [4, 9+1+4]],
+        };
+        this.greenInactive = [[1, 1], [1, 4], [4, 1], [4, 4]];
+        this.redInactive = [[9+1, 1], [9+1, 4], [9+1+4, 1], [9+1+4, 4]];
+        this.yellowInactive = [[9+1, 9+1], [9+1, 9+1+4], [9+1+4, 9+1], [9+1+4, 9+1+4]];
+        this.blueInactive = [[1, 9+1], [1, 9+1+4], [4, 9+1], [4, 9+1+4]];
         //Number of starting pieces for each player on the board
         this.pieces = 4;
     }
@@ -88,28 +98,28 @@ class Board{
         //Make unit calc easier for home square.
         const [homeX, homeY] = [this.x*3, this.y*3];
         //TODO: eventually add in image for home
-        // let homeImg = new Image();
-        // homeImg.src = './resources/piece.png';
-        // console.log(homeImg);
-        // console.log(this.ctx.drawImage(homeImg, 0, 0));
         this.makeRectangle('#004d1a', 0, 0, bigX, bigY);
         this.makeRectangle('#4d0f00', 9*this.x, 0, bigX, bigY);
         this.makeRectangle('#00004d', 0, 9*this.y, bigX, bigY);
         this.makeRectangle('#4d4d00', 9*this.x, 9*this.y, bigX, bigY);
         this.makeRectangle('pink', 2*homeX, 2*homeY, homeX, homeY);
         // Draw all vertical paths
-        this.makePath(6, 0, 5, 'vertical');
-        this.makePath(7, 0, 5, 'vertical');
-        this.makePath(8, 0, 5, 'vertical');
-        this.makePath(6, 9, 5, 'vertical');
-        this.makePath(7, 9, 5, 'vertical');
-        this.makePath(8, 9, 5, 'vertical');
-        this.makePath(0, 6, 5, 'horizontal');
-        this.makePath(0, 7, 5, 'horizontal');
-        this.makePath(0, 8, 5, 'horizontal');
-        this.makePath(9, 6, 5, 'horizontal');
-        this.makePath(9, 7, 5, 'horizontal');
-        this.makePath(9, 8, 5, 'horizontal');
+            //The arrays are coordinates for all the paths going from left->right (vertical) and top->bottom (horizontal)
+        const verticalPaths = [[6, 0, 5], [7, 0, 5], [8, 0, 5], [6, 9, 5], [7, 9, 5], [8, 9, 5]];
+        const horizontalPaths = [[0, 6, 5], [0, 7, 5], [0, 8, 5], [9, 6, 5], [9, 7, 5], [9, 8, 5]];
+        for (let i=0; i<=verticalPaths.length; i++){
+            try{
+                this.makePath(...verticalPaths[i], 'vertical');
+            }catch(err){
+                //Do nothing: the error is ...verticalPaths[i] not iterable but the makePath function still receives the parameters
+            }
+        }
+        for (let i=0; i<=verticalPaths.length; i++){
+            try{
+                this.makePath(...horizontalPaths[i], 'horizontal');
+            }catch(err){
+            }
+        }
         //Draw colored paths
         this.makeRectangle('green', this.startCord.greenStart[0], this.startCord.greenStart[1]);
         this.makePath(1, 7, 4, 'horizontal', 'green');
@@ -120,45 +130,30 @@ class Board{
         this.makeRectangle('blue', this.startCord.yellowStart[0], this.startCord.yellowStart[1]);
         this.makePath(7, 9, 4, 'vertical', 'blue');
         //Draw Pieces
-            //Green pieces
-                //top-left
-        this.makePiece('#39e600', 1, 1);
-                //bottom-left
-        this.makePiece('#39e600', 1, 4);
-                //top-right
-        this.makePiece('#39e600', 4, 1);
-                //bottom-right
-        this.makePiece('#39e600', 4, 4);
+            //Green pieces: top-left, bottom-left, top-right, & bottom-right
+        this.makePiece('#39e600', ...this.coord.green[0]);
+        this.makePiece('#39e600', ...this.coord.green[1]);
+        this.makePiece('#39e600', ...this.coord.green[2]);
+        this.makePiece('#39e600', ...this.coord.green[3]);
 
-            //Red Pieces
-                //top-left
-        this.makePiece('#e60000', 9 + 1, 1);
-                //bottom-left
-        this.makePiece('#e60000', 9 + 1, 4);
-                //top-right
-        this.makePiece('#e60000', 9 + 1 + 4, 1);
-                //bottom-right
-        this.makePiece('#e60000', 9 + 1 + 4, 4);
+        //Red pieces: top-left, bottom-left, top-right, & bottom-right
+        this.makePiece('#e60000', ...this.coord.red[0]);
+        this.makePiece('#e60000', ...this.coord.red[1]);
+        this.makePiece('#e60000', ...this.coord.red[2]);
+        this.makePiece('#e60000', ...this.coord.red[3]);
 
-            //Yellow Pieces
-                //top-left
-        this.makePiece('#e6e600', 9 + 1, 9 + 1);
-                //bottom-left
-        this.makePiece('#e6e600', 9 + 1, 9 + 1 + 4);
-                //top-right
-        this.makePiece('#e6e600', 9 + 1 + 4, 9 + 1);
-                //bottom-right
-        this.makePiece('#e6e600', 9 + 1 + 4, 9 + 1 + 4);
+        //Yellow pieces: top-left, bottom-left, top-right, & bottom-right
+        this.makePiece('#e6e600', ...this.coord.yellow[0]);
+        this.makePiece('#e6e600', ...this.coord.yellow[1]);
+        this.makePiece('#e6e600', ...this.coord.yellow[2]);
+        this.makePiece('#e6e600', ...this.coord.yellow[3]);
 
-            //Blue pieces
-                //top-left
-        this.makePiece('#0000e6', 1, 9 + 1);
-                //bottom-left
-        this.makePiece('#0000e6', 1, 9 + 1 + 4);
-                //top-right
-        this.makePiece('#0000e6', 4, 9 + 1);
-                //bottom-right
-        this.makePiece('#0000e6', 4, 9 + 1 + 4);
+        //Blue pieces: top-left, bottom-left, top-right, & bottom-right
+        this.makePiece('#0000e6', ...this.coord.blue[0]);
+        this.makePiece('#0000e6', ...this.coord.blue[1]);
+        this.makePiece('#0000e6', ...this.coord.blue[2]);
+        this.makePiece('#0000e6', ...this.coord.blue[3]);
+
     }
 
     clearScreen(){
