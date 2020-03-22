@@ -27,18 +27,20 @@ class Board{
         this.x = xunit;
         this.y = yunit;
         this.ctx = ctx;
-        this.startCoord = {
-            //each are coordinates of the starting coordinates for each piece
-            greenStart: [1, 6],
-            redStart: [8, 1],
-            blueStart: [13, 8],
-            yellowStart: [6, 13]
-        };
+        // this.startCoord = {
+        //     //each are coordinates of the starting coordinates for each piece
+        //     greenStart: [1, 6],
+        //     redStart: [8, 1],
+        //     blueStart: [13, 8],
+        //     yellowStart: [6, 13]
+        // };
+        //The coordinates are green, red, yellow, blue
+        this.startCoord = [[1, 6], [8, 1], [13, 8], [6, 13]]
         this.coord = {
             green: [[1, 1], [1, 4], [4, 1], [4, 4]],
-            red: [[9+1, 1], [9+1, 4], [9+4, 1], [9+4, 4]],
-            yellow: [[9+1, 9+1], [9+1, 9+4], [9+4, 9+1], [9+4, 9+4]],
-            blue: [[1, 9+1], [1, 9+4], [4, 9+1], [4, 9+4]],
+            red: [[10, 1], [10, 4], [13, 1], [13, 4]],
+            yellow: [[10, 10], [10, 13], [13, 10], [13, 13]],
+            blue: [[1, 10], [1, 13], [4, 10], [4, 13]],
         };
         this.greenInactive = [[1, 1], [1, 4], [4, 1], [4, 4]];
         this.redInactive = [[9+1, 1], [9+1, 4], [9+4, 1], [9+4, 4]];
@@ -130,14 +132,15 @@ class Board{
             }
         }
         //Draw colored paths
-        this.makeRectangle('green', this.startCoord.greenStart[0], this.startCoord.greenStart[1]);
-        this.makePath(1, 7, 4, 'horizontal', 'green');
-        this.makeRectangle('red', this.startCoord.redStart[0], this.startCoord.redStart[1]);
-        this.makePath(7, 1, 4, 'vertical', 'red');
-        this.makeRectangle('yellow', this.startCoord.blueStart[0], this.startCoord.blueStart[1]);
-        this.makePath(9, 7, 4, 'horizontal', 'yellow');
-        this.makeRectangle('blue', this.startCoord.yellowStart[0], this.startCoord.yellowStart[1]);
-        this.makePath(7, 9, 4, 'vertical', 'blue');
+        //The startCoord is indexed as 0: green, 1: red, 2: yellow, 3: blue
+        this.makeRectangle('#004D1A', this.startCoord[0][0], this.startCoord[0][1]);
+        this.makePath(1, 7, 4, 'horizontal', '#004D1A');
+        this.makeRectangle('#4D0F00', this.startCoord[1][0], this.startCoord[1][1]);
+        this.makePath(7, 1, 4, 'vertical', '#4D0F00');
+        this.makeRectangle('#4D4D00', this.startCoord[2][0], this.startCoord[2][1]);
+        this.makePath(9, 7, 4, 'horizontal', '#4D4D00');
+        this.makeRectangle('#00004D', this.startCoord[3][0], this.startCoord[3][1]);
+        this.makePath(7, 9, 4, 'vertical', '#00004D');
         //Draw Pieces
         //Green pieces: top-left, bottom-left, top-right, & bottom-right
         this.placePiece('#39e600', this.coord.green);
@@ -162,7 +165,7 @@ class MainController{
         const [dx, dy] = this.setupCanvas();
         this.boardCtl = new Board(dx, dy, this.ctx);
         this.pieces = parseInt(document.getElementById('num-pieces').textContent);
-        this.players = [this.boardCtl.coord.green, this.boardCtl.coord.red, this.boardCtl.coord.yellow,this.boardCtl.coord.yellow];
+        this.players = [this.boardCtl.coord.green, this.boardCtl.coord.red, this.boardCtl.coord.yellow,this.boardCtl.coord.blue];
         //First player is always green
         this.activePlayer = 0;
     }
@@ -184,8 +187,14 @@ class MainController{
         this.pieces -=1;
         this.uiCtl.reducePieces(this.pieces);
         //Draw the board with a piece on the starting line
-        let startCoord = this.boardCtl.startCoord.greenStart;
-        this.boardCtl.coord.green[this.pieces] = startCoord;
+        let startCoord = this.boardCtl.startCoord[this.activePlayer]
+        this.players[this.activePlayer][this.pieces] = startCoord;
+        // this.boardCtl.coord.green[this.pieces] = startCoord;
+        // console.log(`The starting coordinates are ...`);
+        // console.log(startCoord);
+        console.log(`The active player is`);
+        console.log(this.players[this.activePlayer]);
+        console.log(`The active player number is ${this.activePlayer}`);
         this.boardCtl.setupBoard();
     }
 
@@ -221,23 +230,13 @@ class MainController{
             }
             this.incrementActivePlayer();
         })
-        //Highlight the active player color
-        //REDUCE SINCE THIS IS REPETITIVE
-        // document.querySelector(domItems.green).addEventListener('click', () => document.querySelector(domItems.green).classList.toggle('active'));
-        // document.querySelector(domItems.red).addEventListener('click', () => document.querySelector(domItems.red).classList.toggle('active'));
-        // document.querySelector(domItems.yellow).addEventListener('click', () => document.querySelector(domItems.yellow).classList.toggle('active'));
-        // document.querySelector(domItems.blue).addEventListener('click', () => document.querySelector(domItems.blue).classList.toggle('active'));
-
     }
-
-    // anim(){
-    //     //Draw the board
-    //     this.boardCtl.setupBoard();
-    // }
 
     init(){
         this.boardCtl.setupBoard();
         this.setupEventListeners();
+        this.activePlayer = 3;
+        this.addPlayer();
     }
 }
 
