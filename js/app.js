@@ -6,10 +6,7 @@ class UI{
             bannerName: '.banner-name',
             game: '.gameScreen',
             dice: '.control-dice',
-            green: '.green',
-            red: '.red',
-            yellow: '.yellow',
-            blue: '.blue',
+            activePlayer: ['.green', '.red', '.yellow', '.blue'],
             pieces: 'num-pieces'
         }
         this.DOMItems = DOMItems;
@@ -39,20 +36,20 @@ class Board{
         };
         this.coord = {
             green: [[1, 1], [1, 4], [4, 1], [4, 4]],
-            red: [[9+1, 1], [9+1, 4], [9+1+4, 1], [9+1+4, 4]],
-            yellow: [[9+1, 9+1], [9+1, 9+1+4], [9+1+4, 9+1], [9+1+4, 9+1+4]],
-            blue: [[1, 9+1], [1, 9+1+4], [4, 9+1], [4, 9+1+4]],
+            red: [[9+1, 1], [9+1, 4], [9+4, 1], [9+4, 4]],
+            yellow: [[9+1, 9+1], [9+1, 9+4], [9+4, 9+1], [9+4, 9+4]],
+            blue: [[1, 9+1], [1, 9+4], [4, 9+1], [4, 9+4]],
         };
         this.greenInactive = [[1, 1], [1, 4], [4, 1], [4, 4]];
-        this.redInactive = [[9+1, 1], [9+1, 4], [9+1+4, 1], [9+1+4, 4]];
-        this.yellowInactive = [[9+1, 9+1], [9+1, 9+1+4], [9+1+4, 9+1], [9+1+4, 9+1+4]];
-        this.blueInactive = [[1, 9+1], [1, 9+1+4], [4, 9+1], [4, 9+1+4]];
+        this.redInactive = [[9+1, 1], [9+1, 4], [9+4, 1], [9+4, 4]];
+        this.yellowInactive = [[9+1, 9+1], [9+1, 9+4], [9+4, 9+1], [9+4, 9+4]];
+        this.blueInactive = [[1, 9+1], [1, 9+4], [4, 9+1], [4, 9+4]];
     }
 
     makePiece(color, x, y){
         //This is the x and y coordinate
-        x = this.x * x;
-        y = this.y * y;
+        x = (this.x * x) + (this.x/2);
+        y = (this.y * y) + (this.y/2);
         //This is the width and height of each tile
         const width = Math.ceil(this.x/2);
         const height = Math.ceil(this.y/2);
@@ -165,6 +162,16 @@ class MainController{
         const [dx, dy] = this.setupCanvas();
         this.boardCtl = new Board(dx, dy, this.ctx);
         this.pieces = parseInt(document.getElementById('num-pieces').textContent);
+        this.players = [this.boardCtl.coord.green, this.boardCtl.coord.red, this.boardCtl.coord.yellow,this.boardCtl.coord.yellow];
+        //First player is always green
+        this.activePlayer = 0;
+    }
+    
+    incrementActivePlayer(){
+        //Remove the highlight from the current active player
+        document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
+        this.activePlayer === 3 ? this.activePlayer = 0 : this.activePlayer++;
+        document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
     }
 
     addPlayer(){
@@ -200,11 +207,6 @@ class MainController{
         const domItems = this.uiCtl.DOMItems;
         //Close Banner
         document.querySelector(domItems.banner).addEventListener('click', e => {
-            // let bannerNode = e.target.parentNode.parentNode;
-            // //This is the "Ludo by Muhammad Ali" text
-            // let textNode = bannerNode.childNodes[1];
-            // let iconNode = bannerNode.childNodes[3]
-            // bannerNode.removeChild(textNode);
             document.querySelector(domItems.bannerName).classList.toggle('close');
         });
         //Roll Dice and add player if dice 6
@@ -213,18 +215,18 @@ class MainController{
             let roll = Math.round(Math.random()*5);
             let icon = `<i class="fas fa-dice-${numWord[roll]} fa-4x"></i>`;
             document.querySelector(domItems.dice).innerHTML = icon
-            this.addPlayer();
-            // if (roll === 6 -1){
-            //     console.log(`Player rolled a six, update a piece`);
-            //     this.addPlayer();
-            // }
+            if (roll === 6 -1){
+                console.log(`Player rolled a six, update a piece`);
+                this.addPlayer();
+            }
+            this.incrementActivePlayer();
         })
         //Highlight the active player color
         //REDUCE SINCE THIS IS REPETITIVE
-        document.querySelector(domItems.green).addEventListener('click', () => document.querySelector(domItems.green).classList.toggle('active'));
-        document.querySelector(domItems.red).addEventListener('click', () => document.querySelector(domItems.red).classList.toggle('active'));
-        document.querySelector(domItems.yellow).addEventListener('click', () => document.querySelector(domItems.yellow).classList.toggle('active'));
-        document.querySelector(domItems.blue).addEventListener('click', () => document.querySelector(domItems.blue).classList.toggle('active'));
+        // document.querySelector(domItems.green).addEventListener('click', () => document.querySelector(domItems.green).classList.toggle('active'));
+        // document.querySelector(domItems.red).addEventListener('click', () => document.querySelector(domItems.red).classList.toggle('active'));
+        // document.querySelector(domItems.yellow).addEventListener('click', () => document.querySelector(domItems.yellow).classList.toggle('active'));
+        // document.querySelector(domItems.blue).addEventListener('click', () => document.querySelector(domItems.blue).classList.toggle('active'));
 
     }
 
