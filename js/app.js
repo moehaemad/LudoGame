@@ -16,9 +16,10 @@ class UI{
         return document.querySelector(this.DOMItems.game);
     }
 
-    reducePieces(x){
+    displayPiecesCount(x){
+        //TODO: Update right after the player switches not once an roll occurs
         const dom = document.getElementById(this.DOMItems.pieces);
-        x <= 0? dom.textContent = "0": dom.textContent = x.toString(); 
+        x <= 0 ? dom.textContent = "0": dom.textContent = x.toString(); 
     }
 }
 
@@ -27,13 +28,7 @@ class Board{
         this.x = xunit;
         this.y = yunit;
         this.ctx = ctx;
-        // this.startCoord = {
-        //     //each are coordinates of the starting coordinates for each piece
-        //     greenStart: [1, 6],
-        //     redStart: [8, 1],
-        //     blueStart: [13, 8],
-        //     yellowStart: [6, 13]
-        // };
+        //each are coordinates of the starting coordinates for each piece
         //The coordinates are green, red, yellow, blue
         this.startCoord = [[1, 6], [8, 1], [13, 8], [6, 13]]
         this.coord = {
@@ -164,7 +159,8 @@ class MainController{
         this.uiCtl = new UI();
         const [dx, dy] = this.setupCanvas();
         this.boardCtl = new Board(dx, dy, this.ctx);
-        this.pieces = parseInt(document.getElementById('num-pieces').textContent);
+        // this.pieces = parseInt(document.getElementById('num-pieces').textContent);
+        this.playerPieces = [4, 4, 4, 4];
         this.players = [this.boardCtl.coord.green, this.boardCtl.coord.red, this.boardCtl.coord.yellow,this.boardCtl.coord.blue];
         //First player is always green
         this.activePlayer = 0;
@@ -177,6 +173,28 @@ class MainController{
         document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
     }
 
+    movePlayer(){
+        return 0;
+    }
+
+    insertOptions(){
+        //if number of pieces <=3
+        //update UI to reflect choices (i.e. move current piece, addPlayer)
+
+        //this is the class of the active player
+        let icons;
+        const playerClass = this.uiCtl.DOMItems.activePlayer[this.activePlayer];
+        document.querySelector[playerClass].innerHTML = icons;
+        return 0;
+    }
+
+    checkElimination(){
+        //check if there are overlapping pieces and eliminate when there is
+        return 0;
+    }
+
+
+
     addPlayer(){
         //Check if no pieces are on board
             //If none -> add onto board
@@ -184,17 +202,12 @@ class MainController{
             //If 6 ask player to move piece on board
 
         //Decrease the number of pieces from UI
-        this.pieces -=1;
-        this.uiCtl.reducePieces(this.pieces);
+        this.playerPieces[this.activePlayer]--;
+        let pieces = this.playerPieces[this.activePlayer];
+        this.uiCtl.displayPiecesCount(pieces);
         //Draw the board with a piece on the starting line
         let startCoord = this.boardCtl.startCoord[this.activePlayer]
-        this.players[this.activePlayer][this.pieces] = startCoord;
-        // this.boardCtl.coord.green[this.pieces] = startCoord;
-        // console.log(`The starting coordinates are ...`);
-        // console.log(startCoord);
-        console.log(`The active player is`);
-        console.log(this.players[this.activePlayer]);
-        console.log(`The active player number is ${this.activePlayer}`);
+        this.players[this.activePlayer][pieces] = startCoord;
         this.boardCtl.setupBoard();
     }
 
@@ -227,6 +240,8 @@ class MainController{
             if (roll === 6 -1){
                 console.log(`Player rolled a six, update a piece`);
                 this.addPlayer();
+                //check->eliminate if player if on the starting coordinates of the active player
+                this.checkElimination();
             }
             this.incrementActivePlayer();
         })
