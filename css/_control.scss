@@ -27,4 +27,10 @@
         align-self: start;
         text-align: center;
     }
+    &-option{
+        @include borderize();
+        align-self: start;
+        text-align: center;
+        color: green;
+    }
 }
