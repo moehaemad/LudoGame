@@ -172,10 +172,18 @@ class Quadrant{
         this.y = y;
         //these are displacement vectors for each piece in a quadrant
         //Quad1: green, Quad2: red, Quad3: yellow, & Quad4: blue
+            //The 2nd ex. quad1[2] is the direction of the home path.
         this.quad1 = ['-dx', '-dy', '+dx'];
         this.quad2 = ['-dy', '+dx', '+dy'];
         this.quad3 = ['+dx', '+dy', '-dx'];
         this.quad4 = ['+dy', '-dx', '-dy'];
+        this.illegalValues = {
+            absolute: [[0,0,5,5], [9,0,14,5], [9,9,14,14], [0,9,5,14], [6,6,8,8]],
+            greenBase: [1,7,5,7],
+            redBase: [7,1,7,5],
+            yellowBase: [9,7,13,7],
+            blueBase: [7,9,7,13]
+        };
     }
 
     getQuadrant(){
@@ -188,7 +196,65 @@ class Quadrant{
         }else if (6 <= this.x <= 8 && 9 <= this.y <= 14){
             return this.quad4;
         }
-        
+    }
+
+    isInHome(x, y, base){
+        let x1 = base[0];
+        let x2 = base[1];
+        let y1 = base[2];
+        let y2 = base[3];
+        if (x1 <= x <= x2 && y1<= y <= y2){
+            return false;
+        }
+    }
+    
+    isLegal(x,y){
+        //Determine if the move is legal. I.e. you don't want to draw pieces where there's no
+            //path.
+            let x1, x2, y1, y2;
+            let valArr = this.illegalValues.absolute;
+            for (let i=0; i<= valArr.length; i++){
+                x1 = valArr[i][0];
+                x2 = valArr[i][1];
+                y1 = valArr[i][2];
+                y2 = valArr[i][3];
+                if (x1 <= x <= x2 && y1 <= y <= y2){
+                    return false;
+                }
+            }
+            //check homebase coordinates. this is separate because once a player eliminates
+                //another player, the former illegal homebase colored path becomes legal.
+            if (!this.isInHome(x,y, this.illegalValues.greenBase)){
+                return false;
+            }else if (!this.isInHome(x,y, this.illegalValues.redBase)){
+                return false;
+            }else if (!this.isInHome(x,y, this.illegalValues.yellowBase)){
+                return false;
+            }else if (!this.isInHome(x,y, this.illegalValues.blueBase)){
+                return false;
+            }
+            return true;
+    }
+
+    getDirection(){
+        let quadrant = this.getQuadrant();
+        let direction;
+        if (this.isLegal(this.x + 1, this.y)){
+            direction = 'dx';
+        }else if (this.isLegal(this.x - 1, this.y)){
+            return 0;
+        }
+        //figuring out where the x, y is w.r.t the quadrant and it's index.
+            //Ex. if you start at (1,6) & roll a 6 you would increase in quad1[3]='+dx'.
+
+        //Go through elements of the quadrant array and determine which indexed value to use.
+        return "";
+    }
+
+    getNewCoordinates(){
+        let dx = this.getDirection();
+
+        return [this.x, this.y];
     }
 }
 
@@ -245,6 +311,7 @@ class MainController{
             this.uiCtl.insertControlItem(i);
             document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', e=>{
                 this.movePlayer(roll);
+                //TODO: make sure to delete the control option from UI once it's clicked
             });
         }
     }
