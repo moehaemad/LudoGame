@@ -7,6 +7,7 @@ class UI{
             game: '.gameScreen',
             dice: '.control-dice',
             controlBoard: '.control',
+            controlOpt: '.control-option',
             activePlayer: ['.green', '.red', '.yellow', '.blue'],
             pieces: 'num-pieces'
         }
@@ -22,6 +23,15 @@ class UI{
         const dom = document.getElementById(this.DOMItems.pieces);
         x <= 0 ? dom.textContent = "0": dom.textContent = x.toString(); 
     }
+
+    insertControlItem(item){
+        let icon = `<div class="control-option">Move Piece ${item}<i class="fas fa-chess-pawn fa-3x"></i></div>`;
+        let insert = this.DOMItems.controlBoard;
+        document.querySelector(insert).insertAdjacentHTML('beforebegin', icon);
+        
+    }
+
+    
 }
 
 class Board{
@@ -202,13 +212,13 @@ class MainController{
         document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
     }
 
-    movePlayer(roll, piece=this.playerPieces[this.activePlayer]){
+    movePlayer(roll, piece=this.playerPieces[this.activePlayer]-1){
         //piece is the number of pieces ex. 4 left in order to index the coordinates of the active player 
         //  ex. if there are 3 pieces then index the last element (i.e. the piece on board)
             //and move it by default. If theres < 3 pieces available then move the piece
             //indexed at the given element.
-        let x = this.players[this.activePlayer].coord[piece][0];
-        let y = this.players[this.activePlayer].coord[piece][1];
+        let x = this.players[this.activePlayer][piece][0];
+        let y = this.players[this.activePlayer][piece][1];
         let quad = new Quadrant(x, y);
         //Implement dx and dy direction.
         if (this.checkQuadrant === "quad1"){
@@ -229,10 +239,14 @@ class MainController{
 
         //this is the class of the active player
         //move player only if number of pieces <=3. if 4
-        let icon = `<div class="control-option">Piece ${4-this.playerPieces[this.activePlayer]}<i class="fas fa-chess-pawn fa-3x"></i></div>`;
-        let insert = this.uiCtl.DOMItems.controlBoard;
-        console.log(insert);
-        document.querySelector(insert).insertAdjacentHTML('beforebegin', icon);
+        const  item = 4 - this.playerPieces[this.activePlayer];
+        // this.uiCtl.insertControlItem(item);
+        for (let i=1; i<=item; i++){
+            this.uiCtl.insertControlItem(i);
+            document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', e=>{
+                this.movePlayer(roll);
+            });
+        }
     }
 
     checkElimination(){
@@ -290,7 +304,7 @@ class MainController{
                 //check->eliminate if player if on the starting coordinates of the active player
                 this.checkElimination();
             }
-            this.insertOptions();
+            this.insertOptions(roll);
             this.incrementActivePlayer();
         })
     }
