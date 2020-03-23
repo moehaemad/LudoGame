@@ -6,6 +6,7 @@ class UI{
             bannerName: '.banner-name',
             game: '.gameScreen',
             dice: '.control-dice',
+            controlBoard: '.control',
             activePlayer: ['.green', '.red', '.yellow', '.blue'],
             pieces: 'num-pieces'
         }
@@ -31,6 +32,7 @@ class Board{
         //each are coordinates of the starting coordinates for each piece
         //The coordinates are green, red, yellow, blue
         this.startCoord = [[1, 6], [8, 1], [13, 8], [6, 13]]
+        //coordinates are in x, y
         this.coord = {
             green: [[1, 1], [1, 4], [4, 1], [4, 4]],
             red: [[10, 1], [10, 4], [13, 1], [13, 4]],
@@ -153,6 +155,33 @@ class Board{
 
 }
 
+class Quadrant{
+    constructor(x, y){
+        //x and y are coordinates
+        this.x = x;
+        this.y = y;
+        //these are displacement vectors for each piece in a quadrant
+        //Quad1: green, Quad2: red, Quad3: yellow, & Quad4: blue
+        this.quad1 = ['-dx', '-dy', '+dx'];
+        this.quad2 = ['-dy', '+dx', '+dy'];
+        this.quad3 = ['+dx', '+dy', '-dx'];
+        this.quad4 = ['+dy', '-dx', '-dy'];
+    }
+
+    getQuadrant(){
+        if (0 <= this.x <= 5 && 6<= this.y <= 8){
+            return this.quad1;
+        }else if (6 <= this.x <= 8 && 0 <= this.y <= 5){
+            return this.quad2;
+        }else if (9 <= this.x <= 14 && 6 <= this.y <= 8){
+            return this.quad3;
+        }else if (6 <= this.x <= 8 && 9 <= this.y <= 14){
+            return this.quad4;
+        }
+        
+    }
+}
+
 class MainController{
 
     constructor(){
@@ -173,19 +202,37 @@ class MainController{
         document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
     }
 
-    movePlayer(){
+    movePlayer(roll, piece=this.playerPieces[this.activePlayer]){
+        //piece is the number of pieces ex. 4 left in order to index the coordinates of the active player 
+        //  ex. if there are 3 pieces then index the last element (i.e. the piece on board)
+            //and move it by default. If theres < 3 pieces available then move the piece
+            //indexed at the given element.
+        let x = this.players[this.activePlayer].coord[piece][0];
+        let y = this.players[this.activePlayer].coord[piece][1];
+        let quad = new Quadrant(x, y);
+        //Implement dx and dy direction.
+        if (this.checkQuadrant === "quad1"){
+            console.log('quad1');
+        }else if (this.checkQuadrant === "quad2"){
+            console.log('quad2');
+        }else if (this.checkQuadrant === "quad3"){
+            console.log('quad3');
+        }else if (this.checkQuadrant === "quad4"){
+            console.log('quad4');
+        }
         return 0;
     }
 
-    insertOptions(){
+    insertOptions(roll){
         //if number of pieces <=3
         //update UI to reflect choices (i.e. move current piece, addPlayer)
 
         //this is the class of the active player
-        let icons;
-        const playerClass = this.uiCtl.DOMItems.activePlayer[this.activePlayer];
-        document.querySelector[playerClass].innerHTML = icons;
-        return 0;
+        //move player only if number of pieces <=3. if 4
+        let icon = `<div class="control-option">Piece ${4-this.playerPieces[this.activePlayer]}<i class="fas fa-chess-pawn fa-3x"></i></div>`;
+        let insert = this.uiCtl.DOMItems.controlBoard;
+        console.log(insert);
+        document.querySelector(insert).insertAdjacentHTML('beforebegin', icon);
     }
 
     checkElimination(){
@@ -243,6 +290,7 @@ class MainController{
                 //check->eliminate if player if on the starting coordinates of the active player
                 this.checkElimination();
             }
+            this.insertOptions();
             this.incrementActivePlayer();
         })
     }
