@@ -173,10 +173,7 @@ class Quadrant{
         //these are displacement vectors for each piece in a quadrant
         //Quad1: green, Quad2: red, Quad3: yellow, & Quad4: blue
             //The 2nd ex. quad1[2] is the direction of the home path.
-        this.quad1 = ['-dx', '-dy', '+dx'];
-        this.quad2 = ['-dy', '+dx', '+dy'];
-        this.quad3 = ['+dx', '+dy', '-dx'];
-        this.quad4 = ['+dy', '-dx', '-dy'];
+        //has unintended effect of moving pieces backwards.
         this.illegalValues = {
             absolute: [[0,0,5,5], [9,0,14,5], [9,9,14,14], [0,9,5,14], [6,6,8,8]],
             greenBase: [1,7,5,7],
@@ -184,18 +181,60 @@ class Quadrant{
             yellowBase: [9,7,13,7],
             blueBase: [7,9,7,13]
         };
+        this.quadrants = new Map();
+        this.setQuadrants();
+        this.currKey = 1;
+    }
+    
+    setQuadrants(){
+        //Each 'quadrant if a path as outlined in the Github README.md
+        this.quadrants.set(1, '-dx');
+        this.quadrants.set(2, '-dy');
+        this.quadrants.set(3, '+dx');
+
+        this.quadrants.set(4, '-dy');
+        this.quadrants.set(5, '+dx');
+        this.quadrants.set(6, '-dy');
+
+        this.quadrants.set(7, '+dx');
+        this.quadrants.set(8, '+dy');
+        this.quadrants.set(9, '-dx');
+
+        this.quadrants.set(10, '+dy');
+        this.quadrants.set(11, '-dx');
+        this.quadrants.set(12, '-dy');
     }
 
-    getQuadrant(){
-        if (0 <= this.x <= 5 && 6<= this.y <= 8){
-            return this.quad1;
-        }else if (6 <= this.x <= 8 && 0 <= this.y <= 5){
-            return this.quad2;
-        }else if (9 <= this.x <= 14 && 6 <= this.y <= 8){
-            return this.quad3;
-        }else if (6 <= this.x <= 8 && 9 <= this.y <= 14){
-            return this.quad4;
+    getQuadrant(x, y){
+        //Most inefficient code ever but I want to see it work before anything.
+        //Will only run once to determine which key (i.e. direction) to use at first.
+        if (1<= x <=5 && y===9){
+            this.currKey = 1;
+        }else if(x===0 && 7<=y<=8){
+            this.currKey = 2;
+        }else if(0<=x<=5 && y===6){
+            this.currKey = 3;
+        }else if(x===6 && 1<=y<=5){
+            this.currKey = 4;
+        }else if(6<=x<=7 && y===0){
+            this.currKey = 5;
+        }else if(x===8 && 0<=y<=5){
+            this.currKey = 6;
+        }else if(9<=x<=13 && y===6){
+            this.currKey = 7;
+        }else if(x===14 && 6<=y<=7){
+            this.currKey = 8;
+        }else if(9<=x<=14 && y===8){
+            this.currKey = 9;
+        }else if(x===8 && 13<=y<=9){
+            this.currKey = 10;
+        }else if(7<=x<=8 && y===14){
+            this.currKey = 11;
+        }else if(x===6 && 9<=y<=14){
+            this.currKey = 12;
         }
+
+        return this.quadrants.get(this.currKey);
     }
 
     isInHome(x, y, base){
@@ -236,24 +275,44 @@ class Quadrant{
             return true;
     }
 
-    getDirection(){
-        let quadrant = this.getQuadrant();
-        let direction;
-        if (this.isLegal(this.x + 1, this.y)){
-            direction = 'dx';
-        }else if (this.isLegal(this.x - 1, this.y)){
-            return 0;
+    changeInDirection (x, y, delta){
+        switch(delta){
+            case('+dx'):
+                return [x + 1, y];
+            case('-dx'):
+                return [x - 1, y];
+            case('+dy'):
+                return [x, y+1];
+            case('-dy'):
+                return [x, y-1];
         }
+    }
+
+    moveCoordinates(direc=''){
+        //'quadrant' is a string of displacement vector ex. '+dx'.
+        if (direc === '')
+            direc = this.getQuadrant(this.x, this.y);
+        //move the coordinates in the direction given by getQuadrant.
+            //if [xchange, ychange] is not valid then change currKey
+        let [dx, dy] = this.changeInDirection(this.x, this.y, direc);
+        //check if the change is valid
+        if (this.isLegal(dx, dy)){
+            this.x = dx;
+            this.y = dy;
+            return 0;
+        } else{
+            this.currKey +=1;
+            console.log(this.quadrants.get(this.currKey));
+            this.moveCoordinates(this.quadrants.get(this.currKey));
+        }
+
+
         //figuring out where the x, y is w.r.t the quadrant and it's index.
             //Ex. if you start at (1,6) & roll a 6 you would increase in quad1[3]='+dx'.
-
-        //Go through elements of the quadrant array and determine which indexed value to use.
-        return "";
     }
 
     getNewCoordinates(){
-        let dx = this.getDirection();
-
+        this.moveCoordinates();
         return [this.x, this.y];
     }
 }
@@ -283,20 +342,14 @@ class MainController{
         //  ex. if there are 3 pieces then index the last element (i.e. the piece on board)
             //and move it by default. If theres < 3 pieces available then move the piece
             //indexed at the given element.
+        console.log('move action!');
         let x = this.players[this.activePlayer][piece][0];
         let y = this.players[this.activePlayer][piece][1];
         let quad = new Quadrant(x, y);
-        //Implement dx and dy direction.
-        if (this.checkQuadrant === "quad1"){
-            console.log('quad1');
-        }else if (this.checkQuadrant === "quad2"){
-            console.log('quad2');
-        }else if (this.checkQuadrant === "quad3"){
-            console.log('quad3');
-        }else if (this.checkQuadrant === "quad4"){
-            console.log('quad4');
-        }
-        return 0;
+        let [dx, dy] = quad.getNewCoordinates();
+
+        //change the coordinates of the active player.
+        this.players[this.activePlayer][piece] = [dx, dy];
     }
 
     insertOptions(roll){
