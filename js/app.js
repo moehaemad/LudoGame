@@ -175,6 +175,7 @@ class Quadrant{
             //The 2nd ex. quad1[2] is the direction of the home path.
         //has unintended effect of moving pieces backwards.
         this.illegalValues = {
+            //the arrays are in x1, y1, x2, y2
             absolute: [[0,0,5,5], [9,0,14,5], [9,9,14,14], [0,9,5,14], [6,6,8,8]],
             greenBase: [1,7,5,7],
             redBase: [7,1,7,5],
@@ -239,40 +240,49 @@ class Quadrant{
 
     isInHome(x, y, base){
         let x1 = base[0];
-        let x2 = base[1];
-        let y1 = base[2];
+        let x2 = base[2];
+        let y1 = base[1];
         let y2 = base[3];
         if (x1 <= x <= x2 && y1<= y <= y2){
             return false;
         }
+        return true;
     }
     
     isLegal(x,y){
         //Determine if the move is legal. I.e. you don't want to draw pieces where there's no
             //path.
+            let toReturn = true;
             let x1, x2, y1, y2;
             let valArr = this.illegalValues.absolute;
-            for (let i=0; i<= valArr.length; i++){
+            for (let i=0; i<= valArr.length -1; i++){
+                console.log(valArr[i]); //the array of illegal coordinates.
                 x1 = valArr[i][0];
-                x2 = valArr[i][1];
-                y1 = valArr[i][2];
+                x2 = valArr[i][2];
+                y1 = valArr[i][1];
                 y2 = valArr[i][3];
-                if (x1 <= x <= x2 && y1 <= y <= y2){
-                    return false;
+                if (x1<=x && x<=x2 && y1<=y && y<=y2){
+                    toReturn = false;
                 }
             }
             //check homebase coordinates. this is separate because once a player eliminates
                 //another player, the former illegal homebase colored path becomes legal.
-            if (!this.isInHome(x,y, this.illegalValues.greenBase)){
-                return false;
-            }else if (!this.isInHome(x,y, this.illegalValues.redBase)){
-                return false;
-            }else if (!this.isInHome(x,y, this.illegalValues.yellowBase)){
-                return false;
-            }else if (!this.isInHome(x,y, this.illegalValues.blueBase)){
-                return false;
+            if (this.isInHome(x,y, this.illegalValues.greenBase)){
+                toReturn = false;
+                console.log(`reached greenBase and return is false`);
+            }else if (this.isInHome(x,y, this.illegalValues.redBase)){
+                toReturn = false;
+                console.log(`reached redBase and return is false`);
+            }else if (this.isInHome(x,y, this.illegalValues.yellowBase)){
+                toReturn = false;
+                console.log(`reached yellowBase and return is false`);
+            }else if (this.isInHome(x,y, this.illegalValues.blueBase)){
+                toReturn = false;
+                console.log(`reached blueBase and return is false`);
             }
-            return true;
+            console.log(`the return value is ${toReturn}`);
+
+            return toReturn;
     }
 
     changeInDirection (x, y, delta){
@@ -292,23 +302,29 @@ class Quadrant{
         //'quadrant' is a string of displacement vector ex. '+dx'.
         if (direc === '')
             direc = this.getQuadrant(this.x, this.y);
+        
+        if (this.currKey === 12){
+            this.currKey = 1;
+        }
         //move the coordinates in the direction given by getQuadrant.
-            //if [xchange, ychange] is not valid then change currKey
+            //if [dx, dy] is not valid then change currKey
         let [dx, dy] = this.changeInDirection(this.x, this.y, direc);
-        //check if the change is valid
+        // console.log(`the current direction is ${direc}`);
+        // console.log(`the coordinates are x=${this.x} and y=${this.y}`);
+        // console.log(`the return of isLegal(${dx}, ${dy}) is ${this.isLegal(dx,dy)}`);
+        console.log(`the current key is ${this.currKey}`);
+        // check if the change is valid
         if (this.isLegal(dx, dy)){
             this.x = dx;
             this.y = dy;
-            return 0;
+            console.log(`successful move! x is ${this.x} and y is ${this.y}`);
         } else{
             this.currKey +=1;
-            console.log(this.quadrants.get(this.currKey));
-            this.moveCoordinates(this.quadrants.get(this.currKey));
+            console.log (`unsuccessful! The current key increased to ${this.currKey}`);
+            let d = this.quadrants.get(this.currKey);
+            // this.moveCoordinates(d);
         }
 
-
-        //figuring out where the x, y is w.r.t the quadrant and it's index.
-            //Ex. if you start at (1,6) & roll a 6 you would increase in quad1[3]='+dx'.
     }
 
     getNewCoordinates(){
@@ -328,6 +344,7 @@ class MainController{
         this.players = [this.boardCtl.coord.green, this.boardCtl.coord.red, this.boardCtl.coord.yellow,this.boardCtl.coord.blue];
         //First player is always green
         this.activePlayer = 0;
+        this.roll = 0;
     }
     
     incrementActivePlayer(){
@@ -337,19 +354,20 @@ class MainController{
         document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
     }
 
-    movePlayer(roll, piece=this.playerPieces[this.activePlayer]-1){
+    movePlayer(roll = this.roll){
         //piece is the number of pieces ex. 4 left in order to index the coordinates of the active player 
         //  ex. if there are 3 pieces then index the last element (i.e. the piece on board)
             //and move it by default. If theres < 3 pieces available then move the piece
             //indexed at the given element.
-        console.log('move action!');
+        const piece = this.playerPieces[this.activePlayer];
+        console.log(`move action!`);
         let x = this.players[this.activePlayer][piece][0];
         let y = this.players[this.activePlayer][piece][1];
         let quad = new Quadrant(x, y);
         let [dx, dy] = quad.getNewCoordinates();
-
         //change the coordinates of the active player.
         this.players[this.activePlayer][piece] = [dx, dy];
+        this.boardCtl.setupBoard();
     }
 
     insertOptions(roll){
@@ -359,12 +377,10 @@ class MainController{
         //this is the class of the active player
         //move player only if number of pieces <=3. if 4
         const  item = 4 - this.playerPieces[this.activePlayer];
-        // this.uiCtl.insertControlItem(item);
         for (let i=1; i<=item; i++){
             this.uiCtl.insertControlItem(i);
-            document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', e=>{
-                this.movePlayer(roll);
-                //TODO: make sure to delete the control option from UI once it's clicked
+            document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', e => {
+                this.movePlayer();
             });
         }
     }
@@ -408,6 +424,7 @@ class MainController{
 
     setupEventListeners(){
         const domItems = this.uiCtl.DOMItems;
+
         //Close Banner
         document.querySelector(domItems.banner).addEventListener('click', e => {
             document.querySelector(domItems.bannerName).classList.toggle('close');
@@ -421,19 +438,18 @@ class MainController{
             if (roll === 6 -1){
                 console.log(`Player rolled a six, update a piece`);
                 this.addPlayer();
-                //check->eliminate if player if on the starting coordinates of the active player
-                this.checkElimination();
+                // this.checkElimination();
+            }else{
+                this.insertOptions(roll);
+                this.incrementActivePlayer();
             }
-            this.insertOptions(roll);
-            this.incrementActivePlayer();
+            
         })
     }
 
     init(){
         this.boardCtl.setupBoard();
         this.setupEventListeners();
-        this.activePlayer = 3;
-        this.addPlayer();
     }
 }
 
