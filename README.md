@@ -3,7 +3,7 @@
 
 ![Game Preview.png](./resources/gamepreview.png)
 
-### *This is a work in progress but a minimal viable concept*
+### *This is a work in progress but a minimal implementation*
 
 > The following are features that need ot be implemented.
 
