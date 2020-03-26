@@ -195,7 +195,7 @@ class Quadrant{
 
         this.quadrants.set(4, '-dy');
         this.quadrants.set(5, '+dx');
-        this.quadrants.set(6, '-dy');
+        this.quadrants.set(6, '+dy');
 
         this.quadrants.set(7, '+dx');
         this.quadrants.set(8, '+dy');
@@ -209,29 +209,29 @@ class Quadrant{
     getQuadrant(x, y){
         //Most inefficient code ever but I want to see it work before anything.
         //Will only run once to determine which key (i.e. direction) to use at first.
-        if (1<= x <=5 && y===9){
+        if (1<= x && x<=5 && y===9){
             this.currKey = 1;
-        }else if(x===0 && 7<=y<=8){
+        }else if(x===0 && 7<=y && y<=8){
             this.currKey = 2;
-        }else if(0<=x<=5 && y===6){
+        }else if(0<=x&& x<=5 && y===6){
             this.currKey = 3;
-        }else if(x===6 && 1<=y<=5){
+        }else if(x===6 && 1<=y && y<=5){
             this.currKey = 4;
-        }else if(6<=x<=7 && y===0){
+        }else if(6<=x && x<=7 && y===0){
             this.currKey = 5;
-        }else if(x===8 && 0<=y<=5){
+        }else if(x===8 && 0<=y && y<=5){
             this.currKey = 6;
-        }else if(9<=x<=13 && y===6){
+        }else if(9<=x && x<=13 && y===6){
             this.currKey = 7;
-        }else if(x===14 && 6<=y<=7){
+        }else if(x===14 && 6<=y && y<=7){
             this.currKey = 8;
-        }else if(9<=x<=14 && y===8){
+        }else if(9<=x && x<=14 && y===8){
             this.currKey = 9;
-        }else if(x===8 && 13<=y<=9){
+        }else if(x===8 && 9<=y && y<=13){
             this.currKey = 10;
-        }else if(7<=x<=8 && y===14){
+        }else if(7<=x && x<=8 && y===14){
             this.currKey = 11;
-        }else if(x===6 && 9<=y<=14){
+        }else if(x===6 && 9<=y && y<=14){
             this.currKey = 12;
         }
 
@@ -255,8 +255,12 @@ class Quadrant{
             let toReturn = true;
             let x1, x2, y1, y2;
             let valArr = this.illegalValues.absolute;
+
+            if (x===-1 || y===-1){
+                toReturn = false;
+            }
+
             for (let i=0; i<= valArr.length -1; i++){
-                console.log(valArr[i]); //the array of illegal coordinates.
                 x1 = valArr[i][0];
                 x2 = valArr[i][2];
                 y1 = valArr[i][1];
@@ -269,22 +273,42 @@ class Quadrant{
                 //another player, the former illegal homebase colored path becomes legal.
             if (this.isInHome(x,y, this.illegalValues.greenBase)){
                 toReturn = false;
-                console.log(`reached greenBase and return is false`);
             }else if (this.isInHome(x,y, this.illegalValues.redBase)){
                 toReturn = false;
-                console.log(`reached redBase and return is false`);
             }else if (this.isInHome(x,y, this.illegalValues.yellowBase)){
                 toReturn = false;
-                console.log(`reached yellowBase and return is false`);
             }else if (this.isInHome(x,y, this.illegalValues.blueBase)){
                 toReturn = false;
-                console.log(`reached blueBase and return is false`);
             }
-            console.log(`the return value is ${toReturn}`);
 
             return toReturn;
     }
 
+    transitionQuadrant(){
+        //make sure current key is of the quadrant and piece has
+            //coordinates of the transition coordinates
+            //green->red (5, 6) key=3
+            //red->yellow (8,5) key=6
+            //yellow->blue (9,8) key=9
+            //blue->green (6,9) key=12
+        let x = this.x;
+        let y = this.y;
+        if (this.currKey===3 && x===5 && y===6){
+            [x, y] = [x+1, y-1];
+        }else if (this.currKey===6 && x===8 && y===5){
+            [x, y] = [x+1, y+1];
+        }else if (this.currKey===9 && x===9 && y===8){
+            [x, y] = [x-1, y+1];
+        }else if (this.currKey===12 && x===6 && y===9){
+            [x, y] = [x-1, y-1];
+            this.currKey = 1;
+            return [x, y]
+        }
+        console.log(`TRANSITION FUNCTION: x=${x} y=${y}`);
+        this.currKey++;
+        return [x, y];
+
+    }
     changeInDirection (x, y, delta){
         switch(delta){
             case('+dx'):
@@ -302,28 +326,26 @@ class Quadrant{
         //'quadrant' is a string of displacement vector ex. '+dx'.
         if (direc === '')
             direc = this.getQuadrant(this.x, this.y);
-        
-        if (this.currKey === 12){
-            this.currKey = 1;
-        }
+            console.log(`FIRST IF: current key is ${this.currKey}`);
+
         //move the coordinates in the direction given by getQuadrant.
             //if [dx, dy] is not valid then change currKey
         let [dx, dy] = this.changeInDirection(this.x, this.y, direc);
-        // console.log(`the current direction is ${direc}`);
-        // console.log(`the coordinates are x=${this.x} and y=${this.y}`);
-        // console.log(`the return of isLegal(${dx}, ${dy}) is ${this.isLegal(dx,dy)}`);
-        console.log(`the current key is ${this.currKey}`);
         // check if the change is valid
         if (this.isLegal(dx, dy)){
             this.x = dx;
             this.y = dy;
-            console.log(`successful move! x is ${this.x} and y is ${this.y}`);
+            console.log(`SUCCESS: x is ${this.x} and y is ${this.y}`);
         } else{
-            this.currKey +=1;
-            console.log (`unsuccessful! The current key increased to ${this.currKey}`);
-            let d = this.quadrants.get(this.currKey);
-            // this.moveCoordinates(d);
+            //this is where transition to a new quadrant happens
+                //recursive function moved the piece in a loop.
+                //this is because it's boxed in between illegal values.
+            [this.x, this.y] = this.transitionQuadrant();
+            console.log(`TRANSITION: unsuccessfull move, x=${this.x} and y=${this.y}`);
+            
         }
+        console.log(`END: direction is ${direc}`);
+        console.log(`END: current key is ${this.currKey}`);
 
     }
 
@@ -360,7 +382,9 @@ class MainController{
             //and move it by default. If theres < 3 pieces available then move the piece
             //indexed at the given element.
         const piece = this.playerPieces[this.activePlayer];
-        console.log(`move action!`);
+        console.log(`the active player is ${this.activePlayer} and piece index is ${piece}`);
+        console.log(`the following is the coordinates of the active player`);
+        console.log(this.players[this.activePlayer]);
         let x = this.players[this.activePlayer][piece][0];
         let y = this.players[this.activePlayer][piece][1];
         let quad = new Quadrant(x, y);
@@ -456,3 +480,6 @@ class MainController{
 mainCtl = new MainController();
 ctx = mainCtl.ctx;
 mainCtl.init();
+// mainCtl.addPlayer();
+// mainCtl.players[0][3] = [6, 9];
+// mainCtl.boardCtl.setupBoard();
