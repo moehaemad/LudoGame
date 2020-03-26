@@ -446,6 +446,7 @@ class MainController{
         return [xUnit, yUnit];
     }
 
+
     setupEventListeners(){
         const domItems = this.uiCtl.DOMItems;
 
@@ -465,7 +466,8 @@ class MainController{
                 // this.checkElimination();
             }else{
                 this.insertOptions(roll);
-                this.incrementActivePlayer();
+                //increment player after insertOptions has resolved.   
+                // this.incrementActivePlayer();
             }
             
         })
