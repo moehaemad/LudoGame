@@ -397,9 +397,6 @@ class MainController{
     insertOptions(roll){
         //if number of pieces <=3
         //update UI to reflect choices (i.e. move current piece, addPlayer)
-
-        //this is the class of the active player
-        //move player only if number of pieces <=3. if 4
         const  item = 4 - this.playerPieces[this.activePlayer];
         for (let i=1; i<=item; i++){
             this.uiCtl.insertControlItem(i);
@@ -407,6 +404,21 @@ class MainController{
                 this.movePlayer();
             });
         }
+        
+        //this is the class of the active player
+        //move player only if number of pieces <=3. if 4
+
+        //Returning a promise to do Asynchronous function calls
+        // return new Promise ((resolve, reject) => {
+        //     const  item = 4 - this.playerPieces[this.activePlayer];
+        //     for (let i=1; i<=item; i++){
+        //         this.uiCtl.insertControlItem(i);
+        //         document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', e => {
+        //             this.movePlayer();
+        //         });
+        //     }
+        //     resolve ('done');
+        // });
     }
 
     checkElimination(){
@@ -461,11 +473,17 @@ class MainController{
             let icon = `<i class="fas fa-dice-${numWord[roll]} fa-4x"></i>`;
             document.querySelector(domItems.dice).innerHTML = icon
             if (roll === 6 -1){
-                console.log(`Player rolled a six, update a piece`);
+                console.log(`Player ${this.activePlayer} rolled a six, update a piece`);
                 this.addPlayer();
+                this.insertOptions(roll);
                 // this.checkElimination();
             }else{
+                // this.insertOptions(roll).then(resolved => {
+                //     this.incrementActivePlayer();
+                // });
+
                 this.insertOptions(roll);
+                this.incrementActivePlayer();
                 //increment player after insertOptions has resolved.   
                 // this.incrementActivePlayer();
             }
