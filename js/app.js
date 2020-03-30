@@ -36,9 +36,18 @@ class UI{
     }
 
     clearControlItems(){
-        const child = document.querySelector(this.DOMItems.controlOpt);
-        let parent = child.parentNode;
-        parent.removeChild(child);
+        return new Promise((resolve, reject) =>{
+            const child = document.querySelector(this.DOMItems.controlOpt);
+            if (child === null){
+                reject('no options available');
+            }
+            let parent = child.parentNode;
+            resolve(parent.removeChild(child));
+        });
+        // const child = document.querySelector(this.DOMItems.controlOpt);
+        // console.log(child);
+        // let parent = child.parentNode;
+        // parent.removeChild(child);
     }
 
     
@@ -417,18 +426,6 @@ class MainController{
         
         //this is the class of the active player
         //move player only if number of pieces <=3. if 4
-
-        //Returning a promise to do Asynchronous function calls
-        // return new Promise ((resolve, reject) => {
-        //     const  item = 4 - this.playerPieces[this.activePlayer];
-        //     for (let i=1; i<=item; i++){
-        //         this.uiCtl.insertControlItem(i);
-        //         document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', e => {
-        //             this.movePlayer();
-        //         });
-        //     }
-        //     resolve ('done');
-        // });
     }
 
     checkElimination(){
@@ -468,6 +465,24 @@ class MainController{
         return [xUnit, yUnit];
     }
 
+    boardLogic(roll){
+        this.uiCtl.clearControlItems().then(resolve =>{
+            console.log(resolve);
+        }).catch(rejected => console.log(rejected));
+        //This function will consume promises from other functions in order to coorindate
+            //calling of functions & to make function calls in an organized place as
+            //opposed to having them in setupEventListeners
+        if (roll === 6-1){ //it's -1 because the random number 'roll' is 0-5 which also
+            //makes indexing other arrays more consistent.
+            this.addPlayer();
+
+            
+            this.insertOptions(roll);
+        }else {
+            this.incrementActivePlayer();
+        }
+    }
+
 
     setupEventListeners(){
         const domItems = this.uiCtl.DOMItems;
@@ -481,18 +496,7 @@ class MainController{
             const numWord = ['one', 'two', 'three', 'four', 'five', 'six'];
             let roll = Math.round(Math.random()*5);
             this.uiCtl.setDice(numWord[roll])
-            if (roll === 6 -1){ //it's -1 because the random number is 0-5 which also
-                //makes indexing the numWord array more consistent.
-                console.log(`Player ${this.activePlayer} rolled a six, update a piece`);
-                this.addPlayer();
-                this.insertOptions(roll);
-                console.log(roll);
-                // this.checkElimination();
-            }else{
-                // this.insertOptions(roll);
-                this.incrementActivePlayer();
-            }
-            
+            this.boardLogic(roll);
         })
     }
 
