@@ -44,10 +44,6 @@ class UI{
             let parent = child.parentNode;
             resolve(parent.removeChild(child));
         });
-        // const child = document.querySelector(this.DOMItems.controlOpt);
-        // console.log(child);
-        // let parent = child.parentNode;
-        // parent.removeChild(child);
     }
 
     
@@ -323,11 +319,11 @@ class Quadrant{
             this.currKey = 1;
             return [x, y]
         }
-        console.log(`TRANSITION FUNCTION: x=${x} y=${y}`);
         this.currKey++;
         return [x, y];
 
     }
+
     changeInDirection (x, y, delta){
         switch(delta){
             case('+dx'):
@@ -395,21 +391,18 @@ class MainController{
         document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
     }
 
-    movePlayer(roll = this.roll){
+    movePlayer(roll = this.roll, player=0){
         //piece is the number of pieces ex. 4 left in order to index the coordinates of the active player 
         //  ex. if there are 3 pieces then index the last element (i.e. the piece on board)
             //and move it by default. If theres < 3 pieces available then move the piece
             //indexed at the given element.
-        const piece = this.playerPieces[this.activePlayer];
-        console.log(`the active player is ${this.activePlayer} and piece index is ${piece}`);
-        console.log(`the following is the coordinates of the active player`);
-        console.log(this.players[this.activePlayer]);
-        let x = this.players[this.activePlayer][piece][0];
-        let y = this.players[this.activePlayer][piece][1];
+
+        let x = this.players[this.activePlayer][player][0];
+        let y = this.players[this.activePlayer][player][1];
         let quad = new Quadrant(x, y);
         let [dx, dy] = quad.getNewCoordinates();
         //change the coordinates of the active player.
-        this.players[this.activePlayer][piece] = [dx, dy];
+        this.players[this.activePlayer][player] = [dx, dy];
         this.boardCtl.setupBoard();
     }
 
@@ -419,8 +412,8 @@ class MainController{
         const  item = 4 - this.playerPieces[this.activePlayer];
         for (let i=1; i<=item; i++){
             this.uiCtl.insertControlItem(i);
-            document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', e => {
-                this.movePlayer();
+            document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', () => {
+                this.movePlayer(roll, 4 - i);
             });
         }
         
@@ -509,3 +502,9 @@ class MainController{
 mainCtl = new MainController();
 ctx = mainCtl.ctx;
 mainCtl.init();
+
+mainCtl.addPlayer();
+mainCtl.movePlayer();
+mainCtl.movePlayer();
+mainCtl.addPlayer();
+mainCtl.insertOptions();
