@@ -24,11 +24,21 @@ class UI{
         x <= 0 ? dom.textContent = "0": dom.textContent = x.toString(); 
     }
 
+    setDice(val){
+        let icon = `<i class="fas fa-dice-${val} fa-4x"></i>`;
+        document.querySelector(this.DOMItems.dice).innerHTML = icon
+    }
+
     insertControlItem(item){
         let icon = `<div class="control-option">Move Piece ${item}<i class="fas fa-chess-pawn fa-3x"></i></div>`;
         let insert = this.DOMItems.controlBoard;
-        document.querySelector(insert).insertAdjacentHTML('beforebegin', icon);
-        
+        document.querySelector(insert).insertAdjacentHTML('afterbegin', icon);
+    }
+
+    clearControlItems(){
+        const child = document.querySelector(this.DOMItems.controlOpt);
+        let parent = child.parentNode;
+        parent.removeChild(child);
     }
 
     
@@ -470,22 +480,17 @@ class MainController{
         document.querySelector(domItems.dice).addEventListener('click', e =>{
             const numWord = ['one', 'two', 'three', 'four', 'five', 'six'];
             let roll = Math.round(Math.random()*5);
-            let icon = `<i class="fas fa-dice-${numWord[roll]} fa-4x"></i>`;
-            document.querySelector(domItems.dice).innerHTML = icon
-            if (roll === 6 -1){
+            this.uiCtl.setDice(numWord[roll])
+            if (roll === 6 -1){ //it's -1 because the random number is 0-5 which also
+                //makes indexing the numWord array more consistent.
                 console.log(`Player ${this.activePlayer} rolled a six, update a piece`);
                 this.addPlayer();
                 this.insertOptions(roll);
+                console.log(roll);
                 // this.checkElimination();
             }else{
-                // this.insertOptions(roll).then(resolved => {
-                //     this.incrementActivePlayer();
-                // });
-
-                this.insertOptions(roll);
+                // this.insertOptions(roll);
                 this.incrementActivePlayer();
-                //increment player after insertOptions has resolved.   
-                // this.incrementActivePlayer();
             }
             
         })
@@ -500,6 +505,3 @@ class MainController{
 mainCtl = new MainController();
 ctx = mainCtl.ctx;
 mainCtl.init();
-// mainCtl.addPlayer();
-// mainCtl.players[0][3] = [6, 9];
-// mainCtl.boardCtl.setupBoard();
