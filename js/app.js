@@ -12,10 +12,21 @@ class UI{
             pieces: 'num-pieces'
         }
         this.DOMItems = DOMItems;
+        //This is the canvas element that's used in 2 functions which is why it's in the
+            //constructor.
+        this.canvas = document.querySelector(this.DOMItems.game);
     }
 
-    getCanvas(){
-        return document.querySelector(this.DOMItems.game);
+    getCanvasXY(){
+        this.canvas.width = (3*window.innerWidth)/4;
+        this.canvas.height = (3*window.innerHeight)/4;
+        let x = Math.round(this.canvas.width/15);
+        let y = Math.round(this.canvas.height/15);
+        return [x, y];
+    }
+
+    getCtx(){
+        return this.canvas.getContext('2d');
     }
 
     displayPiecesCount(x){
@@ -341,7 +352,6 @@ class Quadrant{
         //'quadrant' is a string of displacement vector ex. '+dx'.
         if (direc === '')
             direc = this.getQuadrant(this.x, this.y);
-            console.log(`FIRST IF: current key is ${this.currKey}`);
 
         //move the coordinates in the direction given by getQuadrant.
             //if [dx, dy] is not valid then change currKey
@@ -350,17 +360,12 @@ class Quadrant{
         if (this.isLegal(dx, dy)){
             this.x = dx;
             this.y = dy;
-            console.log(`SUCCESS: x is ${this.x} and y is ${this.y}`);
         } else{
             //this is where transition to a new quadrant happens
                 //recursive function moved the piece in a loop.
                 //this is because it's boxed in between illegal values.
             [this.x, this.y] = this.transitionQuadrant();
-            console.log(`TRANSITION: unsuccessfull move, x=${this.x} and y=${this.y}`);
-            
         }
-        console.log(`END: direction is ${direc}`);
-        console.log(`END: current key is ${this.currKey}`);
 
     }
 
@@ -374,7 +379,8 @@ class MainController{
 
     constructor(){
         this.uiCtl = new UI();
-        const [dx, dy] = this.setupCanvas();
+        const [dx, dy] = this.uiCtl.getCanvasXY();
+        this.ctx = this.uiCtl.getCtx();
         this.boardCtl = new Board(dx, dy, this.ctx);
         // this.pieces = parseInt(document.getElementById('num-pieces').textContent);
         this.playerPieces = [4, 4, 4, 4];
@@ -401,10 +407,10 @@ class MainController{
         let y = this.players[this.activePlayer][player][1];
         let quad = new Quadrant(x, y);
         let dx, dy;
-        for (let i=0; i<roll; i++){
+        console.log(`the roll is ${roll}`);
+        for (let i=1; i<=roll; i++){
             [dx, dy] = quad.getNewCoordinates();
         }
-        console.log(`the roll is ${roll}`);
         this.players[this.activePlayer][player] = [dx, dy];
         this.boardCtl.setupBoard();
     }
@@ -416,13 +422,20 @@ class MainController{
         for (let i=1; i<=item; i++){
             this.uiCtl.insertControlItem(i);
             document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', () => {
-                console.log(`the roll is ${roll}`);
                 this.movePlayer(roll, 4 - i);
             });
         }
         
         //this is the class of the active player
         //move player only if number of pieces <=3. if 4
+    }
+
+    insertOptionMove(roll){
+        return 0;
+    }
+
+    insertOptionAdd(){
+        return 0;
     }
 
     checkElimination(){
@@ -448,33 +461,30 @@ class MainController{
         this.boardCtl.setupBoard();
     }
 
-    setupCanvas(){
-        const canvas = this.uiCtl.getCanvas()
-        //Make Canvas resizeable
-        canvas.width = window.innerWidth - 20;
-        canvas.height = window.innerHeight - 20;
-        const ctx = canvas.getContext('2d');
-        this.ctx = ctx;
-
-        //The Ludo game is a 15x15 matrix
-        const xUnit = Math.round(canvas.width/15);
-        const yUnit = Math.round(canvas.height/15);
-        return [xUnit, yUnit];
-    }
-
     boardLogic(roll){
+        //this consumes a promise to clear the options everytime the dice is clicked
+            //to prevent overlapping options that are no longer active.
         this.uiCtl.clearControlItems().then(resolve =>{
             console.log(resolve);
         }).catch(rejected => console.log(rejected));
-        //This function will consume promises from other functions in order to coorindate
-            //calling of functions & to make function calls in an organized place as
-            //opposed to having them in setupEventListeners
-        if (roll === 6-1){ //it's -1 because the random number 'roll' is 0-5 which also
-            //makes indexing other arrays more consistent.
-            this.addPlayer();
 
-            
-            this.insertOptions(roll);
+        //this is the number (array) of pieces the active player has
+        let pieces = this.playerPieces[this.activePlayer];
+        if (roll === 6){
+            //if you get a 6, depending on the number of pieces already on the board
+                //the following logic is executed.
+            if (pieces === 4){
+                //case 0: if number of pieces is 4 then automatically add player because
+                    //you can't add options for a player not on the board
+                this.addPlayer();
+            }else if (pieces <= 3){
+                //case 1: (roll=6 and pieces <=3) insert option to add player or move
+                //insert option to move
+                //insert option to add
+                console.log(`case 1`)
+            }
+            // this.addPlayer();
+            // this.insertOptions(roll);
         }else {
             this.incrementActivePlayer();
         }
@@ -488,12 +498,15 @@ class MainController{
         document.querySelector(domItems.banner).addEventListener('click', e => {
             document.querySelector(domItems.bannerName).classList.toggle('close');
         });
-        //Roll Dice and add player if dice 6
+        //Set an event listener for the dice icon
         document.querySelector(domItems.dice).addEventListener('click', e =>{
+            //array to send the UI class to display font-awesome icons
             const numWord = ['one', 'two', 'three', 'four', 'five', 'six'];
             let roll = Math.round(Math.random()*5);
-            this.uiCtl.setDice(numWord[roll])
-            this.boardLogic(roll);
+            this.uiCtl.setDice(numWord[roll]);
+            //pass in roll+1 because 0<=roll<=5 in order to index numWord so pass
+                //boardLogic the true value in order to move player properly.
+            this.boardLogic(roll+1);
         })
     }
 
