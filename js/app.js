@@ -381,7 +381,6 @@ class MainController{
         this.players = [this.boardCtl.coord.green, this.boardCtl.coord.red, this.boardCtl.coord.yellow,this.boardCtl.coord.blue];
         //First player is always green
         this.activePlayer = 0;
-        this.roll = 0;
     }
     
     incrementActivePlayer(){
@@ -391,17 +390,21 @@ class MainController{
         document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
     }
 
-    movePlayer(roll = this.roll, player=0){
+    movePlayer(roll = 1, player=0){
         //piece is the number of pieces ex. 4 left in order to index the coordinates of the active player 
         //  ex. if there are 3 pieces then index the last element (i.e. the piece on board)
             //and move it by default. If theres < 3 pieces available then move the piece
             //indexed at the given element.
 
+        //x and y are coordinates of the active player indexed at variable 'player' which is 0-3
         let x = this.players[this.activePlayer][player][0];
         let y = this.players[this.activePlayer][player][1];
         let quad = new Quadrant(x, y);
-        let [dx, dy] = quad.getNewCoordinates();
-        //change the coordinates of the active player.
+        let dx, dy;
+        for (let i=0; i<roll; i++){
+            [dx, dy] = quad.getNewCoordinates();
+        }
+        console.log(`the roll is ${roll}`);
         this.players[this.activePlayer][player] = [dx, dy];
         this.boardCtl.setupBoard();
     }
@@ -413,6 +416,7 @@ class MainController{
         for (let i=1; i<=item; i++){
             this.uiCtl.insertControlItem(i);
             document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', () => {
+                console.log(`the roll is ${roll}`);
                 this.movePlayer(roll, 4 - i);
             });
         }
@@ -502,9 +506,3 @@ class MainController{
 mainCtl = new MainController();
 ctx = mainCtl.ctx;
 mainCtl.init();
-
-mainCtl.addPlayer();
-mainCtl.movePlayer();
-mainCtl.movePlayer();
-mainCtl.addPlayer();
-mainCtl.insertOptions();
