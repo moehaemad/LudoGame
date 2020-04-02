@@ -434,13 +434,6 @@ class MainController{
         //First player is always green
         this.activePlayer = 0;
     }
-    
-    incrementActivePlayer(){
-        //Remove the highlight from the current active player
-        document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
-        this.activePlayer === 3 ? this.activePlayer = 0 : this.activePlayer++;
-        document.querySelector(this.uiCtl.DOMItems.activePlayer[this.activePlayer]).classList.toggle('active');
-    }
 
     movePlayer(roll = 1, player=0){
         //piece is the number of pieces ex. 4 left in order to index the coordinates of the active player 
@@ -517,6 +510,10 @@ class MainController{
         this.boardCtl.setupBoard();
     }
 
+    incrementPlayer(){
+        this.activePlayer = this.uiCtl.incrementActivePlayer(this.activePlayer);
+    }
+
     clearOptions(){
             //this consumes a promise to clear the options everytime the dice is clicked
         //to prevent overlapping options that are no longer active.
@@ -527,10 +524,11 @@ class MainController{
 
     boardLogic(roll){
         this.clearOptions();
-
+        this.incrementPlayer();
         //this is the number (array) of pieces the active player has
         const pieces = this.playerPieces[this.activePlayer];
         const remaining = 4 - pieces;
+        console.log(`the current active player is ${this.activePlayer}`);
         if (roll === 6){
             //if you get a 6, depending on the number of pieces already on the board
                 //the following logic is executed.
@@ -559,11 +557,8 @@ class MainController{
                 console.log(this.playerPieces);
                 this.insertOptions(roll, 'move');
             }
-
-            //increment the active player and increase the integer of the active player
-                //the boundry of 0<= activePlayer <=3 is implemented in UI function.
-            this.activePlayer = this.uiCtl.incrementActivePlayer(this.activePlayer);
         }
+        console.log(`END active player is ${this.activePlayer}`);
     }
 
 
@@ -583,7 +578,7 @@ class MainController{
             //pass in roll+1 because 0<=roll<=5 in order to index numWord so pass
                 //boardLogic the true value in order to move player properly.
             this.boardLogic(roll+1);
-            this.uiCtl.clearControlItems();
+            // this.clearOptions();
         })
     }
 
@@ -596,9 +591,3 @@ class MainController{
 mainCtl = new MainController();
 ctx = mainCtl.ctx;
 mainCtl.init();
-
-mainCtl.addPlayer();
-mainCtl.movePlayer(4, 3);
-mainCtl.addPlayer();
-mainCtl.insertOptions(4, 'move');
-mainCtl.insertOptions(1, 'add');
