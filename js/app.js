@@ -583,6 +583,7 @@ class MainController{
             //pass in roll+1 because 0<=roll<=5 in order to index numWord so pass
                 //boardLogic the true value in order to move player properly.
             this.boardLogic(roll+1);
+            this.uiCtl.clearControlItems();
         })
     }
 
