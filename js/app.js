@@ -487,8 +487,29 @@ class MainController{
         })
     }
 
+    getOtherPlayers(active){
+        let toReturn = [0, 1, 2, 3];
+        const ind = toReturn.find(val => val === active);
+        toReturn.splice(ind, 1);
+        return toReturn;
+    }
+
+    changeCoordInitial(arrXY){
+        //arrXY is an array of x, y coordinates where the coordinates overlapped
+
+    }
+
     checkElimination(){
         //check if there are overlapping pieces and eliminate when there is
+
+        //get all of the other players aside from the active player
+        //This is an array of 4 coordinates x, y also in an array form
+        let coordinates = this.players[this.activePlayer];
+        let other = this.getOtherPlayers(this.activePlayer);
+
+        //iterate through each other players coordinates and ask if the are the same
+            //if they're the same, call this.changeCoordInitial
+
         return 0;
     }
 
