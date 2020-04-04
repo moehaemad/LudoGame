@@ -104,10 +104,10 @@ class Board{
         //These are the coordinates of the inactive pieces that should be indexed
             //whenever a player gets eliminated
         this.inactive = {
-            green: [[1, 1], [1, 4], [4, 1], [4, 4]],
-            red: [[9+1, 1], [9+1, 4], [9+4, 1], [9+4, 4]],
-            yellow: [[9+1, 9+1], [9+1, 9+4], [9+4, 9+1], [9+4, 9+4]],
-            blue: [[1, 9+1], [1, 9+4], [4, 9+1], [4, 9+4]]
+            "green": [[1, 1], [1, 4], [4, 1], [4, 4]],
+            "red": [[9+1, 1], [9+1, 4], [9+4, 1], [9+4, 4]],
+            "yellow": [[9+1, 9+1], [9+1, 9+4], [9+4, 9+1], [9+4, 9+4]],
+            "blue": [[1, 9+1], [1, 9+4], [4, 9+1], [4, 9+4]]
         }
     }
 
@@ -489,14 +489,29 @@ class MainController{
 
     getOtherPlayers(active){
         let toReturn = [0, 1, 2, 3];
+        //get index of the active player
         const ind = toReturn.find(val => val === active);
+        //remove that index from the return array
         toReturn.splice(ind, 1);
+        //return the indexes of the players left
         return toReturn;
     }
 
-    changeCoordInitial(arrXY){
-        //arrXY is an array of x, y coordinates where the coordinates overlapped
+    changeCoordInitial(indElim, player){
+        //indElim is the index of elimination and player is the active player both of
+            //which are integers.
+            //ex. Green piece[3] = [1,1] and red piece[3] = [1,1]
 
+        //toChange will be the property we want to access in inactive object
+            //in the Board constructor.
+        const toChange = ["green", "red", "yellow", "blue"][player];
+        //of the player passed in, on it's indElim indexed coordinates, change that
+            //players respective coordinates to those from the corresponding inactive
+            //coordinates.
+            //ex. change coord.green[indElim] = inactive.green[indElim]
+        this.players[player][indElim] = this.boardCtl.inactive[toChange][indElim];
+        //redraw the board to reflect change.
+        this.boardCtl.setupBoard();
     }
 
     checkElimination(){
@@ -508,6 +523,8 @@ class MainController{
         let other = this.getOtherPlayers(this.activePlayer);
 
         //iterate through each other players coordinates and ask if the are the same
+            //so for each player, go through array of coordinates(array). Do comparison
+            //on arrays.
             //if they're the same, call this.changeCoordInitial
 
         return 0;
@@ -531,10 +548,6 @@ class MainController{
         this.boardCtl.setupBoard();
     }
 
-    incrementPlayer(){
-        this.activePlayer = this.uiCtl.incrementActivePlayer(this.activePlayer);
-    }
-
     clearOptions(){
             //this consumes a promise to clear the options everytime the dice is clicked
         //to prevent overlapping options that are no longer active.
@@ -545,7 +558,8 @@ class MainController{
 
     boardLogic(roll){
         this.clearOptions();
-        this.incrementPlayer();
+        //increment the active player in the UI
+        this.activePlayer = this.uiCtl.incrementActivePlayer(this.activePlayer);
         //this is the number (array) of pieces the active player has
         const pieces = this.playerPieces[this.activePlayer];
         const remaining = 4 - pieces;
