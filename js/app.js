@@ -498,10 +498,9 @@ class MainController{
     }
 
     changeCoordInitial(indElim, player){
-        //indElim is the index of elimination and player is the active player both of
-            //which are integers.
+        //indElim is the index of elimination and player is the overlapping player both
+            //of which are integers.
             //ex. Green piece[3] = [1,1] and red piece[3] = [1,1]
-
         //toChange will be the property we want to access in inactive object
             //in the Board constructor.
         const toChange = ["green", "red", "yellow", "blue"][player];
@@ -510,6 +509,9 @@ class MainController{
             //coordinates.
             //ex. change coord.green[indElim] = inactive.green[indElim]
         this.players[player][indElim] = this.boardCtl.inactive[toChange][indElim];
+        console.log(`the new coordinates for player ${player} at index ${indElim}`);
+        console.log(`this is the new array`);
+        console.log(this.players[player]);
         //redraw the board to reflect change.
         this.boardCtl.setupBoard();
     }
@@ -537,10 +539,19 @@ class MainController{
             //so for each player, go through array of coordinates(array). Do comparison
             //on arrays.
             //if they're the same, call this.changeCoordInitial
-        let ind = 0;
+        //their should only be 1 index because more than two pieces overlapping would
+            //suggest that a piece hadn't been eliminated yet.
+        let ind, player;
+        let res =-1;
         for (let i of other){
-            this.compareActiveOther(activeArr, this.players[i]);
+            res = this.compareActiveOther(activeArr, this.players[i]);
+            if (res !== undefined){
+                player = i;
+                ind = res;
+            }
         }
+        console.log(`changing the coordinates with index ${ind} and player ${player}`);
+        this.changeCoordInitial(ind, player);
     }
 
 
@@ -641,32 +652,8 @@ ctx = mainCtl.ctx;
 mainCtl.init();
 
 
-var board = mainCtl.boardCtl.coord;
-var players = [board.green, board.red, board.yellow, board.blue];
-var coordinates = players[0];
-var others = [1];
-
-function checkElimEx(){
-    for (let i of others){
-        // console.log(`we're on the ${i} iteration and using player`);
-        // console.log(players[i]);
-        compareActiveOther(players[0], players[i]);
-    }
-}
-
-function compareActiveOther(activeArr, otherArr){
-    for (let i=0; i<activeArr.length; i++){
-        if (activeArr[i][0] === otherArr[i][0] && activeArr[i][1] === otherArr[i][1]){
-            //didn't want to implement a prototype function for Arrays to compare the
-                // two arrays because this takes less code.
-            return i;
-        }
-    }
-}
-
-//setting the same coordinates x=0 y=6
-players[0][3] = [0,6];
-players[1][3] = [0,6];
+mainCtl.addPlayer();
+mainCtl.boardCtl.coord.red[3] = [1,6];
 mainCtl.boardCtl.setupBoard();
 
-checkElimEx();
+mainCtl.checkElimination();
