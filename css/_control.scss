@@ -4,6 +4,13 @@
     border-radius: 15px;
 }
 
+$color: (
+    bg: white,
+    border: black
+);
+
+$list_size: 20px;
+
 .control{
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
@@ -15,12 +22,32 @@
     &-info{
         @include borderize();
         align-self: start;
+        &__rules.open{
+            @include borderize();
+            position: fixed;
+            top: 100px;
+            left: 20px;
+            right: 20px;
+            bottom: 50px;
+            background: map-get($color, bg);
+            ul{
+                margin: 2rem;
+                font-size: $list_size;
+            }
+            .unimplemented{
+                font-size: $list-size;
+                color: maroon;
+                position: fixed;
+                bottom: 100px;
+                left: 100px;
+            }
+        }
     }
     &-dice{
         @include borderize();
         align-self: center;
         color: black;
-        background-color: white;
+        background-color: map-get($color, bg);
     }
     &-pieces{
         @include borderize();
