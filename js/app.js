@@ -514,20 +514,33 @@ class MainController{
         this.boardCtl.setupBoard();
     }
 
+    compareActiveOther(activeArr, otherArr){
+        //returns the index where the values are the same
+        for (let i=0; i<activeArr.length; i++){
+            if (activeArr[i][0] === otherArr[i][0] && activeArr[i][1] === otherArr[i][1]){
+                //didn't want to implement a prototype function for Arrays to compare the
+                    // two arrays because this takes less code.
+                return i;
+            }
+        }
+    }
+
     checkElimination(){
         //check if there are overlapping pieces and eliminate when there is
 
         //get all of the other players aside from the active player
         //This is an array of 4 coordinates x, y also in an array form
-        let coordinates = this.players[this.activePlayer];
+        let activeArr = this.players[this.activePlayer];
         let other = this.getOtherPlayers(this.activePlayer);
 
         //iterate through each other players coordinates and ask if the are the same
             //so for each player, go through array of coordinates(array). Do comparison
             //on arrays.
             //if they're the same, call this.changeCoordInitial
-
-        return 0;
+        let ind = 0;
+        for (let i of other){
+            this.compareActiveOther(activeArr, this.players[i]);
+        }
     }
 
 
@@ -626,3 +639,34 @@ class MainController{
 mainCtl = new MainController();
 ctx = mainCtl.ctx;
 mainCtl.init();
+
+
+var board = mainCtl.boardCtl.coord;
+var players = [board.green, board.red, board.yellow, board.blue];
+var coordinates = players[0];
+var others = [1];
+
+function checkElimEx(){
+    for (let i of others){
+        // console.log(`we're on the ${i} iteration and using player`);
+        // console.log(players[i]);
+        compareActiveOther(players[0], players[i]);
+    }
+}
+
+function compareActiveOther(activeArr, otherArr){
+    for (let i=0; i<activeArr.length; i++){
+        if (activeArr[i][0] === otherArr[i][0] && activeArr[i][1] === otherArr[i][1]){
+            //didn't want to implement a prototype function for Arrays to compare the
+                // two arrays because this takes less code.
+            return i;
+        }
+    }
+}
+
+//setting the same coordinates x=0 y=6
+players[0][3] = [0,6];
+players[1][3] = [0,6];
+mainCtl.boardCtl.setupBoard();
+
+checkElimEx();
