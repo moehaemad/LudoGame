@@ -452,6 +452,7 @@ class MainController{
         }
         this.players[this.activePlayer][player] = [dx, dy];
         this.boardCtl.setupBoard();
+        this.checkElimination();
     }
 
     insertOptions(roll, action){
@@ -551,7 +552,7 @@ class MainController{
             }
         }
         console.log(`changing the coordinates with index ${ind} and player ${player}`);
-        this.changeCoordInitial(ind, player);
+        if (ind != undefined && player !=undefined) this.changeCoordInitial(ind, player);
     }
 
 
@@ -570,6 +571,7 @@ class MainController{
         let startCoord = this.boardCtl.startCoord[this.activePlayer]
         this.players[this.activePlayer][pieces] = startCoord;
         this.boardCtl.setupBoard();
+        this.checkElimination();
     }
 
     clearOptions(){
