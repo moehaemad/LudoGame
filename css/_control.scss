@@ -30,6 +30,7 @@ $list_size: 20px;
             right: 20px;
             bottom: 50px;
             background: map-get($color, bg);
+            overflow-y: scroll;
             ul{
                 margin: 2rem;
                 font-size: $list_size;
@@ -37,9 +38,15 @@ $list_size: 20px;
             .unimplemented{
                 font-size: $list-size;
                 color: maroon;
-                position: fixed;
-                bottom: 100px;
-                left: 100px;
+                // position: fixed;
+                // bottom: 100px;
+                // left: 100px;
+            }
+            & i{
+                color: red;
+                position: absolute;
+                top: 20px;
+                right: 20px;
             }
         }
     }

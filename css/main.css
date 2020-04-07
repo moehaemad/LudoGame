@@ -74,6 +74,7 @@
   right: 20px;
   bottom: 50px;
   background: white;
+  overflow-y: scroll;
 }
 
 .control-info__rules.open ul {
@@ -84,9 +85,13 @@
 .control-info__rules.open .unimplemented {
   font-size: 20px;
   color: maroon;
-  position: fixed;
-  bottom: 100px;
-  left: 100px;
+}
+
+.control-info__rules.open i {
+  color: red;
+  position: absolute;
+  top: 20px;
+  right: 20px;
 }
 
 .control-dice {
