@@ -9,7 +9,12 @@ class UI{
             controlBoard: '.control',
             controlOpt: '.control-option',
             activePlayer: ['.green', '.red', '.yellow', '.blue'],
-            pieces: 'num-pieces'
+            piecesId: 'num-pieces',
+            info: '.control-info',
+            infoIcon: '.fa-question-circle',
+            closeIcon: '.info-close',
+            rulesInfo: '.control-info__rules',
+            rulesIcon: '.rules_icon'
         }
         this.DOMItems = DOMItems;
         //This is the canvas element that's used in 2 functions which is why it's in the
@@ -34,7 +39,7 @@ class UI{
 
     displayPiecesCount(x){
         //TODO: Update right after the player switches not once an roll occurs
-        const dom = document.getElementById(this.DOMItems.pieces);
+        const dom = document.getElementById(this.DOMItems.piecesId);
         x <= 0 ? dom.textContent = "0": dom.textContent = x.toString(); 
     }
 
@@ -42,6 +47,13 @@ class UI{
         //Adds the icon of the dice on the fly by using innerHTML property
         let icon = `<i class="fas fa-dice-${val} fa-4x"></i>`;
         document.querySelector(this.DOMItems.dice).innerHTML = icon
+    }
+
+    insertRules(){
+        return new Promise (resolve => {
+            let toInsert =`<div class="control-info__rules"><h2>Rules</h2><ul><li>Once you roll a 6, you can add a player.</li><li>If you roll a value that moves you on top of a player, you eliminate that player and send them back to their inactive space.</li><li>*Once you eliminate a player, you have to make a run through the entire board and once you return to your colored path, you can move to the home base and get closer to winning.</li><li>*Winning requires that you move all of your pieces to the home base.</li></ul><p class="unimplemented">* = The features have not yet been implemented</p></div>`;
+            document.querySelector(this.DOMItems.info).insertAdjacentHTML('beforeend', toInsert);
+        });
     }
 
     insertOptionItem(item, message){
@@ -622,14 +634,36 @@ class MainController{
         console.log(`END active player is ${this.activePlayer}`);
     }
 
+    closeButton(e){
+        console.log(e.target);
+    }
+
 
     setupEventListeners(){
         const domItems = this.uiCtl.DOMItems;
+        
+
+        //insert the rules of the game
+        document.querySelector(domItems.infoIcon).addEventListener('click', e => {
+            this.uiCtl.insertRules().then(resolve =>{
+            }).catch(e => console.log(e));
+        });
+        document.querySelector(domItems.closeIcon).addEventListener('click', e=>{
+            try{
+                let child = document.querySelector(domItems.rulesInfo);
+                let parent = child.parentElement;
+                parent.removeChild(child);
+            }catch(e){
+                console.log(e)
+            }
+
+        });
 
         //Close Banner
         document.querySelector(domItems.banner).addEventListener('click', e => {
             document.querySelector(domItems.bannerName).classList.toggle('close');
         });
+        
         //Set an event listener for the dice icon
         document.querySelector(domItems.dice).addEventListener('click', e =>{
             //array to send the UI class to display font-awesome icons
@@ -659,3 +693,4 @@ mainCtl.boardCtl.coord.red[3] = [1,6];
 mainCtl.boardCtl.setupBoard();
 
 mainCtl.checkElimination();
+
