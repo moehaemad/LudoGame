@@ -123,7 +123,7 @@ class Board{
         }
     }
 
-    makePiece(color, x, y){
+    makePiece(color, x, y, num = 1){
         //This is the x and y coordinate of a piece that's centered around a grid tile
         x = (this.x * x) + (this.x/2);
         y = (this.y * y) + (this.y/2);
@@ -136,7 +136,11 @@ class Board{
         this.ctx.fillStyle = color;
         this.ctx.beginPath();
         this.ctx.arc(x, y, circleRad, 0, 2*Math.PI);
+        // this.ctx.fillText('1', x, y);
         this.ctx.fill();
+        //this is the color for the text being displayed
+        this.ctx.fillStyle = "white";
+        this.ctx.fillText(String(num), x, y);
     }
 
     placePiece(color, arr){
@@ -223,6 +227,8 @@ class Board{
         this.makeRectangle('#00004D', this.startCoord[3][0], this.startCoord[3][1]);
         this.makePath(7, 9, 4, 'vertical', '#00004D');
         //Draw Pieces
+        //make the font for each piece a constant value for each piece
+        this.ctx.font = "bold 25px serif";
         //Green pieces: top-left, bottom-left, top-right, & bottom-right
         this.placePiece('#39e600', this.coord.green);
 
@@ -567,8 +573,6 @@ class MainController{
         if (ind != undefined && player !=undefined) this.changeCoordInitial(ind, player);
     }
 
-
-
     addPlayer(){
         //Check if no pieces are on board
             //If none -> add onto board
@@ -687,10 +691,4 @@ mainCtl = new MainController();
 ctx = mainCtl.ctx;
 mainCtl.init();
 
-
 mainCtl.addPlayer();
-mainCtl.boardCtl.coord.red[3] = [1,6];
-mainCtl.boardCtl.setupBoard();
-
-mainCtl.checkElimination();
-
