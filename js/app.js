@@ -123,7 +123,7 @@ class Board{
         }
     }
 
-    makePiece(color, x, y, num = 1){
+    makePiece(color, x, y, num){
         //This is the x and y coordinate of a piece that's centered around a grid tile
         x = (this.x * x) + (this.x/2);
         y = (this.y * y) + (this.y/2);
@@ -139,22 +139,31 @@ class Board{
         // this.ctx.fillText('1', x, y);
         this.ctx.fill();
         //this is the color for the text being displayed
-        this.ctx.fillStyle = "white";
+        this.ctx.fillStyle = "black";
         this.ctx.fillText(String(num), x, y);
     }
 
     placePiece(color, arr){
         //it'll place the pieces given an array of coordinates
-        for(let i=0; i<=arr.length; i++){
-            //Using the try catch statement because the spread operater threw an error
-                //but still passed the values to makePiece
+
+        arr.forEach((val, ind) => {
             try{
-                this.makePiece(color, ...arr[i]);
+                //x=val[0] and y=val[1]
+                this.makePiece(color, val[0], val[1], ind);
             }catch(err){
-                //error of Symbol(Symbol.iterator) not iterable, don't understand yet
-                    //the code should execute though
+                console.log(err);
             }
-        }
+        })
+        // for(let i=0; i<=arr.length; i++){
+        //     //Using the try catch statement because the spread operater threw an error
+        //         //but still passed the values to makePiece
+        //     try{
+        //         this.makePiece(color, ...arr[i]);
+        //     }catch(err){
+        //         //error of Symbol(Symbol.iterator) not iterable, don't understand yet
+        //             //the code should execute though
+        //     }
+        // }
     }
 
     makeRectangle(color, x, y, width = this.x, height = this.y){
