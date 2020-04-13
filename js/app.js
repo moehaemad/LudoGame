@@ -442,7 +442,7 @@ class MainController{
         this.players = [this.boardCtl.coord.green, this.boardCtl.coord.red, this.boardCtl.coord.yellow,this.boardCtl.coord.blue];
         //First player is always green
         this.activePlayer = 0;
-        this.quad = -1;
+        this.quad = new Quadrant(-1, -1);
     }
 
     getActiveName(index = undefined){
@@ -460,7 +460,9 @@ class MainController{
         //x and y are coordinates of the active player indexed at variable 'player' which is 0-3
         let x = this.players[this.activePlayer][player][0];
         let y = this.players[this.activePlayer][player][1];
-        this.quad = new Quadrant(x, y);
+        console.log(`creating a new Quadrant object with x=${x} and y=${y}`);
+        this.quad.x = x;
+        this.quad.y = y;
         let dx, dy;
         for (let i=1; i<=roll; i++){
             [dx, dy] = this.quad.getNewCoordinates();
