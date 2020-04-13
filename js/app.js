@@ -150,6 +150,9 @@ class Board{
         arr.forEach((val, ind) => {
             try{
                 //x=val[0] and y=val[1]
+                //do ind-4 to display piece values consistent with options that are
+                    //displayed.
+                ind = Math.abs(ind - 4);
                 this.makePiece(color, val[0], val[1], ind);
             }catch(err){
                 console.log(err);
@@ -487,7 +490,7 @@ class MainController{
             this.uiCtl.insertOptionItem(i, 'Move Piece');
             document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', () => {
                 this.movePlayer(roll, 4 - i);
-                this.uiCtl.clearControlItems();
+                // this.uiCtl.clearControlItems();
             });
         }
     }
@@ -659,9 +662,11 @@ class MainController{
             //array to send the UI class to display font-awesome icons
             const numWord = ['one', 'two', 'three', 'four', 'five', 'six'];
             let roll = Math.round(Math.random()*5);
+            roll=1;
             this.uiCtl.setDice(numWord[roll]);
             //pass in roll+1 because 0<=roll<=5 in order to index numWord so pass
                 //boardLogic the true value in order to move player properly.
+            console.log(this.quad);
             this.boardLogic(roll+1);
             // this.clearOptions();
         })
