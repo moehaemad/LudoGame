@@ -397,13 +397,14 @@ class Quadrant{
     }
 
     goHome(x, y){
-        if (0<=x && x<=5 && y==7){
+        // add player specification to only move to their respective home tiles
+        if (0<=x && x<=5 && y==7 && this.player === "green"){
             this.currKey = 13;
-        }else if (x===7 && 0<=y && y<=5){
+        }else if (x===7 && 0<=y && y<=5 && this.player === "red"){
             this.currKey = 14;
-        }else if (9<=x && x<=14 && y===7){
+        }else if (9<=x && x<=14 && y===7 && this.player === "yellow"){
             this.currKey = 15;
-        }else if (x===7 && 9<=y && y<=14){
+        }else if (x===7 && 9<=y && y<=14 && this.player === "blue"){
             this.currKey = 16;
         }
     }
@@ -690,7 +691,8 @@ ctx = mainCtl.ctx;
 mainCtl.init();
 
 mainCtl.addPlayer();
-mainCtl.boardCtl.coord.green[3] = [0,7];
+mainCtl.boardCtl.coord.green[3] = [0,6];
+mainCtl.quad.illegalValues.yellow = true;
 mainCtl.quad.illegalValues.green = true;
 // mainCtl.quad.illegalValues['green'] = true;
 mainCtl.boardCtl.setupBoard();
