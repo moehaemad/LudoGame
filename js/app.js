@@ -263,6 +263,7 @@ class Quadrant{
             yellow: false,
             blue: false
         };
+        this.player = 'unknown';
         //This map object lists in which way to move a piece i.e. +dx, -dy, +dy etc.
         this.quadrants = new Map();
         //Using a function to set the values of the Map object
@@ -324,16 +325,9 @@ class Quadrant{
             this.currKey = 11;
         }else if(x===6 && 9<=y && y<=14){
             this.currKey = 12;
-        }else if (0<=x && x<=5 && y===7 && this.illegalValues.green){
-            this.currKey = 13;
-        }else if (x===7 && 0<=y && y<=5 && this.illegalValues.red){
-            this.currKey = 14;
-        }else if (9<=x && x<=14 && y===7 && this.illegalValues.yellow){
-            this.currKey = 15;
-        }else if (x===7 && 9<=y && y<=14 && this.illegalValues.blue){
-            this.currKey = 16;
         }
 
+        if (this.illegalValues[this.player]) this.goHome(x, y);
         return this.quadrants.get(this.currKey);
     }
     
@@ -370,6 +364,7 @@ class Quadrant{
             //red->yellow (8,5) key=6
             //yellow->blue (9,8) key=9
             //blue->green (6,9) key=12
+        let increment = true;
         let x = this.x;
         let y = this.y;
         if (this.currKey===3 && x===5 && y===6){
@@ -381,11 +376,10 @@ class Quadrant{
         }else if (this.currKey===12 && x===6 && y===9){
             [x, y] = [x-1, y-1];
             this.currKey = 1;
-            return [x, y]
+            increment=false;
         }
-        this.currKey++;
+        if (increment) this.currKey++;
         return [x, y];
-
     }
 
     changeInDirection (x, y, delta){
@@ -402,6 +396,18 @@ class Quadrant{
         }
     }
 
+    goHome(x, y){
+        if (0<=x && x<=5 && y==7){
+            this.currKey = 13;
+        }else if (x===7 && 0<=y && y<=5){
+            this.currKey = 14;
+        }else if (9<=x && x<=14 && y===7){
+            this.currKey = 15;
+        }else if (x===7 && 9<=y && y<=14){
+            this.currKey = 16;
+        }
+    }
+
     moveCoordinates(){
         //get the direction to move the current coordinates.
         const direc = this.getQuadrant(this.x, this.y);
@@ -413,13 +419,12 @@ class Quadrant{
         if (this.isLegal(dx, dy)){
             this.x = dx;
             this.y = dy;
-        } else{
+        }else{
             //this is where transition to a new quadrant happens
                 //recursive function moved the piece in a loop.
                 //this is because it's boxed in between illegal values.
             [this.x, this.y] = this.transitionQuadrant();
         }
-
     }
 
     getNewCoordinates(){
@@ -460,7 +465,6 @@ class MainController{
         //x and y are coordinates of the active player indexed at variable 'player' which is 0-3
         let x = this.players[this.activePlayer][player][0];
         let y = this.players[this.activePlayer][player][1];
-        console.log(`creating a new Quadrant object with x=${x} and y=${y}`);
         this.quad.x = x;
         this.quad.y = y;
         let dx, dy;
@@ -603,8 +607,9 @@ class MainController{
 
     boardLogic(roll){
         this.clearOptions();
-        //increment the active player in the UI
+        //increment the active player in the UI and change class variable
         this.activePlayer = this.uiCtl.incrementActivePlayer(this.activePlayer);
+        this.quad.player = this.getActiveName(this.activePlayer);
         //this is the number (array) of pieces the active player has
         const pieces = this.playerPieces[this.activePlayer];
         const remaining = 4 - pieces;
@@ -668,8 +673,8 @@ class MainController{
             this.uiCtl.setDice(numWord[roll]);
             //pass in roll+1 because 0<=roll<=5 in order to index numWord so pass
                 //boardLogic the true value in order to move player properly.
-            console.log(this.quad);
             this.boardLogic(roll+1);
+            console.log(this.quad);
             // this.clearOptions();
         })
     }
@@ -686,5 +691,6 @@ mainCtl.init();
 
 mainCtl.addPlayer();
 mainCtl.boardCtl.coord.green[3] = [0,7];
+mainCtl.quad.illegalValues.green = true;
 // mainCtl.quad.illegalValues['green'] = true;
 mainCtl.boardCtl.setupBoard();
