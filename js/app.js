@@ -436,13 +436,13 @@ class Quadrant{
 
     checkWon (){
         let [x, y] = [this.x, this.y];
-        if (x === 5 && y === 7){
+        if (x === 6 && y === 7){
             return true;
-        }else if (x === 7 && y==5){
+        }else if (x === 7 && y==6){
             return true;
-        }else if (x === 9 && y === 7){
+        }else if (x === 8 && y === 7){
             return true;
-        }else if (x === 7 && y === 9){
+        }else if (x === 7 && y === 8){
             return true;
         }else{
             return false;
@@ -472,7 +472,18 @@ class MainController{
         return playerColor[this.activePlayer];
     }
 
+    removeWonPlayer(ind){
+        console.log(`In removeWonPlayer function with index ${ind}`);
+        // Remove(pop) the active player from the array of players
+        let playerArr = this.players[this.activePlayer];
+        playerArr = playerArr.splice(ind, 1);
+        console.log(playerArr);
+        this.players[this.activePlayer] = playerArr;
+    }
+
     movePlayer(roll = 1, player=0){
+        // Player is the piece to be indexed in the cooridnates object from the Board
+            // class.
         //piece is the number of pieces ex. 4 left in order to index the coordinates of the active player 
         //  ex. if there are 3 pieces then index the last element (i.e. the piece on board)
             //and move it by default. If theres < 3 pieces available then move the piece
@@ -487,7 +498,7 @@ class MainController{
         
         for (let i=1; i<=roll; i++){
             [dx, dy] = this.quad.getNewCoordinates();
-            if (this.quad.checkWon()) console.log(`remove player`);
+            if (this.quad.checkWon()) this.removeWonPlayer(player);
         }
         this.players[this.activePlayer][player] = [dx, dy];
         this.boardCtl.setupBoard();
@@ -709,7 +720,7 @@ ctx = mainCtl.ctx;
 mainCtl.init();
 
 mainCtl.addPlayer();
-mainCtl.boardCtl.coord.green[3] = [0,6];
+mainCtl.boardCtl.coord.green[3] = [0,8];
 mainCtl.quad.illegalValues.yellow = true;
 mainCtl.quad.illegalValues.green = true;
 // mainCtl.quad.illegalValues['green'] = true;
