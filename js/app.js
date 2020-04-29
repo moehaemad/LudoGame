@@ -257,6 +257,8 @@ class Quadrant{
         //This is all the illegal values that the pieces can never be drawn in
         this.illegalValues = {
             //the arrays are in x1, y1, x2, y2
+            // The arrays inside 'absolute' are of green, red, yellow, and blue player tiles
+                // the last array in 'absolute' is of the home
             absolute: [[0,0,5,5], [9,0,14,5], [9,9,14,14], [0,9,5,14], [6,6,8,8]],
             green: false,
             red: false,
@@ -396,8 +398,16 @@ class Quadrant{
         }
     }
 
+    removeHomeRules(){
+        this.illegalValues.absolute.pop();
+        const toInsert = [[6,6,6,6], [8,6,8,6], [8,8,8,8], [6,8,6,8]];
+        this.illegalValues.absolute.push(toInsert);
+    }
+
     goHome(x, y){
         // add player specification to only move to their respective home tiles
+        if (this.illegalValues[this.player]) this.removeHomeRules();
+
         if (0<=x && x<=5 && y==7 && this.player === "green"){
             this.currKey = 13;
         }else if (x===7 && 0<=y && y<=5 && this.player === "red"){
