@@ -406,7 +406,7 @@ class Quadrant{
             this.currKey = 15;
         }else if (x===7 && 9<=y && y<=14 && this.player === "blue"){
             this.currKey = 16;
-        }
+        } 
     }
 
     moveCoordinates(){
@@ -432,6 +432,21 @@ class Quadrant{
         //helper function to return the new coordinates.
         this.moveCoordinates();
         return [this.x, this.y];
+    }
+
+    checkWon (){
+        let [x, y] = [this.x, this.y];
+        if (x === 5 && y === 7){
+            return true;
+        }else if (x === 7 && y==5){
+            return true;
+        }else if (x === 9 && y === 7){
+            return true;
+        }else if (x === 7 && y === 9){
+            return true;
+        }else{
+            return false;
+        }
     }
 }
 
@@ -469,8 +484,10 @@ class MainController{
         this.quad.x = x;
         this.quad.y = y;
         let dx, dy;
+        
         for (let i=1; i<=roll; i++){
             [dx, dy] = this.quad.getNewCoordinates();
+            if (this.quad.checkWon()) console.log(`remove player`);
         }
         this.players[this.activePlayer][player] = [dx, dy];
         this.boardCtl.setupBoard();
@@ -500,6 +517,7 @@ class MainController{
                 // this.uiCtl.clearControlItems();
             });
         }
+        // Check if the player has won
     }
 
     addOption(item){
