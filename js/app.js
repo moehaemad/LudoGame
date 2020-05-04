@@ -470,6 +470,7 @@ class MainController{
         this.ctx = this.uiCtl.getCtx();
         this.boardCtl = new Board(dx, dy, this.ctx);
         this.playerPieces = [4, 4, 4, 4];
+        this.wonPieces = [0, 0, 0, 0];
         this.players = [this.boardCtl.coord.green, this.boardCtl.coord.red, this.boardCtl.coord.yellow,this.boardCtl.coord.blue];
         //First player is always green
         this.activePlayer = 0;
@@ -486,9 +487,14 @@ class MainController{
         console.log(`In removeWonPlayer function with index ${ind}`);
         // Remove(pop) the active player from the array of players
         let playerArr = this.players[this.activePlayer];
-        playerArr = playerArr.splice(ind, 1);
-        console.log(playerArr);
-        this.players[this.activePlayer] = playerArr;
+        // playerArr.splice(ind, 1);
+        this.players[this.activePlayer] = playerArr.splice(ind, 1);
+        console.log(this.players[this.activePlayer]);
+        // Decrease number of pieces since the player has won and add it to count of
+            // pieces that've already won. Don't decrease number of Player pieces just
+            // add to number of won pieces because it'll already be decremented in adding.
+        // this.playerPieces[this.activePlayer]--;
+        this.wonPieces[this.activePlayer]++;
     }
 
     movePlayer(roll = 1, player=0){
@@ -518,7 +524,8 @@ class MainController{
     insertOptions(roll, action){
         //if number of pieces <=3
         //update UI to reflect choices (i.e. move current piece, addPlayer)
-        const  item = 4 - this.playerPieces[this.activePlayer];
+        const  item = (4 - this.wonPieces[this.activePlayer]) - this.playerPieces[this.activePlayer];
+        console.log(`the number of pieces is ${item}`);
         if (action === 'move'){
             this.moveOption(item, roll);
         }
@@ -532,10 +539,11 @@ class MainController{
 
     moveOption(item, roll){
         for (let i=1; i<=item; i++){
+            console.log(`the ith piece to add is piece=${i}`);
             this.uiCtl.insertOptionItem(i, 'Move Piece');
             document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', () => {
                 this.movePlayer(roll, 4 - i);
-                // this.uiCtl.clearControlItems();
+                this.uiCtl.clearControlItems();
             });
         }
         // Check if the player has won
@@ -576,14 +584,22 @@ class MainController{
     }
 
     compareActiveOther(activeArr, otherArr){
+        // Deal with arrays that are not of the same length
+            // forEach activeArr compare with each element in the otherArray
+        activeArr.forEach((val, ind) => {
+            otherArr.forEach((otherVal, otherInd) => {
+                if (val[0] === otherVal[0] && val[1] === otherVal[1]) return ind;
+            });
+        })
+
         //returns the index where the values are the same
-        for (let i=0; i<activeArr.length; i++){
-            if (activeArr[i][0] === otherArr[i][0] && activeArr[i][1] === otherArr[i][1]){
-                //didn't want to implement a prototype function for Arrays to compare the
-                    // two arrays because this takes less code.
-                return i;
-            }
-        }
+        // for (let i=0; i<activeArr.length; i++){
+        //     if (activeArr[i][0] === otherArr[i][0] && activeArr[i][1] === otherArr[i][1]){
+        //         //didn't want to implement a prototype function for Arrays to compare the
+        //             // two arrays because this takes less code.
+        //         return i;
+        //     }
+        // }
     }
 
     checkElimination(){
@@ -714,7 +730,6 @@ class MainController{
             //pass in roll+1 because 0<=roll<=5 in order to index numWord so pass
                 //boardLogic the true value in order to move player properly.
             this.boardLogic(roll+1);
-            console.log(this.quad);
             // this.clearOptions();
         })
     }
