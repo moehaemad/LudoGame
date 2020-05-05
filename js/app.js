@@ -146,7 +146,6 @@ class Board{
 
     placePiece(color, arr){
         //it'll place the pieces given an array of coordinates
-
         arr.forEach((val, ind) => {
             try{
                 //x=val[0] and y=val[1]
@@ -475,6 +474,8 @@ class MainController{
         //First player is always green
         this.activePlayer = 0;
         this.quad = new Quadrant(-1, -1);
+        // For debugging
+        this.diceRoll=2;
     }
 
     getActiveName(index = undefined){
@@ -495,6 +496,36 @@ class MainController{
             // add to number of won pieces because it'll already be decremented in adding.
         // this.playerPieces[this.activePlayer]--;
         this.wonPieces[this.activePlayer]++;
+    }
+
+    insertOptions(roll, action){
+        //if number of pieces <=3
+        //update UI to reflect choices (i.e. move current piece, addPlayer)
+        const  item = (4 - this.wonPieces[this.activePlayer]) - this.playerPieces[this.activePlayer];
+        if (this.activePlayer === 3){
+            console.log(`the number of pieces is ${item}`);
+            console.log(`won pieces=${this.wonPieces[this.activePlayer]} and remaining pieces=${this.playerPieces[this.activePlayer]}`);
+        }
+        if (action === 'move'){
+            this.moveOption(item, roll);
+        }
+        if (action === 'add'){
+            this.addOption(item);
+        }
+        
+        //this is the class of the active player
+        //move player only if number of pieces <=3. if 4
+    }
+
+    moveOption(item, roll){
+        for (let i=1; i<=item; i++){
+            this.uiCtl.insertOptionItem(i, 'Move Piece');
+            document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', () => {
+                this.movePlayer(roll, 4 - i);
+                this.uiCtl.clearControlItems();
+            });
+        }
+        // Check if the player has won
     }
 
     movePlayer(roll = 1, player=0){
@@ -521,40 +552,39 @@ class MainController{
         this.checkElimination();
     }
 
-    insertOptions(roll, action){
-        //if number of pieces <=3
-        //update UI to reflect choices (i.e. move current piece, addPlayer)
-        const  item = (4 - this.wonPieces[this.activePlayer]) - this.playerPieces[this.activePlayer];
-        console.log(`the number of pieces is ${item}`);
-        if (action === 'move'){
-            this.moveOption(item, roll);
-        }
-        if (action === 'add'){
-            this.addOption(item);
-        }
-        
-        //this is the class of the active player
-        //move player only if number of pieces <=3. if 4
-    }
-
-    moveOption(item, roll){
-        for (let i=1; i<=item; i++){
-            console.log(`the ith piece to add is piece=${i}`);
-            this.uiCtl.insertOptionItem(i, 'Move Piece');
-            document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', () => {
-                this.movePlayer(roll, 4 - i);
-                this.uiCtl.clearControlItems();
-            });
-        }
-        // Check if the player has won
-    }
-
     addOption(item){
         this.uiCtl.insertOptionItem(item, 'Add Piece');
         document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', ()=>{
             this.addPlayer();
             this.uiCtl.clearControlItems();
         })
+    }
+
+    changeBoardObj(player, index=3){
+        return 0;
+    }
+    
+    addPlayer(){
+        //Check if no pieces are on board
+            //If none -> add onto board
+            //If 1 >= pieces >= 3  ask player to add a piece onto the board or move pieces on board
+            //If 6 ask player to move piece on board
+
+        //Decrease the number of pieces from UI
+        this.playerPieces[this.activePlayer]--;
+        let pieces = this.playerPieces[this.activePlayer];
+        this.uiCtl.displayPiecesCount(pieces);
+        //Draw the board with a piece on the starting line
+        let startCoord = this.boardCtl.startCoord[this.activePlayer]
+        console.log(`adding player at index ${pieces}`);
+        // TODO: change this to reference object;
+        this.players[this.activePlayer][pieces] = startCoord;
+
+        // possible bug when referencing this.players as way to boardCtl instance.
+        let index = this.getActiveName(this.activePlayer);
+        this.boardCtl.coord[index][pieces] = startCoord;
+        this.boardCtl.setupBoard();
+        this.checkElimination();
     }
 
     getOtherPlayers(active){
@@ -591,15 +621,6 @@ class MainController{
                 if (val[0] === otherVal[0] && val[1] === otherVal[1]) return ind;
             });
         })
-
-        //returns the index where the values are the same
-        // for (let i=0; i<activeArr.length; i++){
-        //     if (activeArr[i][0] === otherArr[i][0] && activeArr[i][1] === otherArr[i][1]){
-        //         //didn't want to implement a prototype function for Arrays to compare the
-        //             // two arrays because this takes less code.
-        //         return i;
-        //     }
-        // }
     }
 
     checkElimination(){
@@ -636,29 +657,10 @@ class MainController{
         }
     }
 
-    addPlayer(){
-        //Check if no pieces are on board
-            //If none -> add onto board
-            //If 1 >= pieces >= 3  ask player to add a piece onto the board or move pieces on board
-            //If 6 ask player to move piece on board
-
-        //Decrease the number of pieces from UI
-        this.playerPieces[this.activePlayer]--;
-        let pieces = this.playerPieces[this.activePlayer];
-        this.uiCtl.displayPiecesCount(pieces);
-        //Draw the board with a piece on the starting line
-        let startCoord = this.boardCtl.startCoord[this.activePlayer]
-        this.players[this.activePlayer][pieces] = startCoord;
-        this.boardCtl.setupBoard();
-        this.checkElimination();
-    }
-
     clearOptions(){
             //this consumes a promise to clear the options everytime the dice is clicked
         //to prevent overlapping options that are no longer active.
-        this.uiCtl.clearControlItems().then(resolve =>{
-            console.log(`cleard ${resolve}`);
-        }).catch(rejected => null);
+        this.uiCtl.clearControlItems().then(resolve =>null).catch(rejected => null);
     }
 
     boardLogic(roll){
@@ -668,7 +670,7 @@ class MainController{
         this.quad.player = this.getActiveName(this.activePlayer);
         //this is the number (array) of pieces the active player has
         const pieces = this.playerPieces[this.activePlayer];
-        const remaining = 4 - pieces;
+        const remaining = (4 - this.wonPieces[this.activePlayer]) - pieces;
         if (roll === 6){
             //if you get a 6, depending on the number of pieces already on the board
                 //the following logic is executed.
@@ -690,6 +692,7 @@ class MainController{
                 //ex. pieces = 4; no pieces to move so move to incrementing player;
                 //ex. pieces = 3; result is 1 piece on board -> insert options
             if (remaining >= 1){
+                console.log(`the remaining number of pieces is ${remaining}`);
                 this.insertOptions(roll, 'move');
             }
         }
@@ -725,7 +728,7 @@ class MainController{
             //array to send the UI class to display font-awesome icons
             const numWord = ['one', 'two', 'three', 'four', 'five', 'six'];
             let roll = Math.round(Math.random()*5);
-            roll=1;
+            roll = this.diceRoll;
             this.uiCtl.setDice(numWord[roll]);
             //pass in roll+1 because 0<=roll<=5 in order to index numWord so pass
                 //boardLogic the true value in order to move player properly.
@@ -745,8 +748,9 @@ ctx = mainCtl.ctx;
 mainCtl.init();
 
 mainCtl.addPlayer();
-mainCtl.boardCtl.coord.green[3] = [0,8];
+mainCtl.boardCtl.coord.green[3] = [0,7];
 mainCtl.quad.illegalValues.yellow = true;
 mainCtl.quad.illegalValues.green = true;
+mainCtl.diceRoll = 5;
 // mainCtl.quad.illegalValues['green'] = true;
 mainCtl.boardCtl.setupBoard();
