@@ -487,9 +487,11 @@ class MainController{
     removeWonPlayer(ind){
         console.log(`In removeWonPlayer function with index ${ind}`);
         // Remove(pop) the active player from the array of players
-        let playerArr = this.players[this.activePlayer];
-        // playerArr.splice(ind, 1);
-        this.players[this.activePlayer] = playerArr.splice(ind, 1);
+        // let playerArr = this.players[this.activePlayer];
+        let index = this.getActiveName(this.activePlayer);
+        let playerArr = this.boardCtl.coord[index];
+        this.boardCtl.coord[index] = playerArr.splice(ind, 1);
+        // this.players[this.activePlayer] = playerArr.splice(ind, 1);
         console.log(this.players[this.activePlayer]);
         // Decrease number of pieces since the player has won and add it to count of
             // pieces that've already won. Don't decrease number of Player pieces just
@@ -547,7 +549,8 @@ class MainController{
             [dx, dy] = this.quad.getNewCoordinates();
             if (this.quad.checkWon()) this.removeWonPlayer(player);
         }
-        this.players[this.activePlayer][player] = [dx, dy];
+        let index = this.getActiveName(this.activePlayer);
+        this.boardCtl.coord[index][player] = [dx, dy];
         this.boardCtl.setupBoard();
         this.checkElimination();
     }
@@ -563,6 +566,7 @@ class MainController{
     changeBoardObj(player, index=3){
         return 0;
     }
+
     
     addPlayer(){
         //Check if no pieces are on board
@@ -575,10 +579,8 @@ class MainController{
         let pieces = this.playerPieces[this.activePlayer];
         this.uiCtl.displayPiecesCount(pieces);
         //Draw the board with a piece on the starting line
-        let startCoord = this.boardCtl.startCoord[this.activePlayer]
+        let startCoord = this.boardCtl.startCoord[this.activePlayer];
         console.log(`adding player at index ${pieces}`);
-        // TODO: change this to reference object;
-        this.players[this.activePlayer][pieces] = startCoord;
 
         // possible bug when referencing this.players as way to boardCtl instance.
         let index = this.getActiveName(this.activePlayer);
@@ -608,7 +610,9 @@ class MainController{
             //players respective coordinates to those from the corresponding inactive
             //coordinates.
             //ex. change coord.green[indElim] = inactive.green[indElim]
-        this.players[player][indElim] = this.boardCtl.inactive[toChange][indElim];
+        let index = this.getActiveName(this.activePlayer);
+        this.boardCtl.coord[index][player][indElim] = this.boardCtl.inactive[toChange][indElim];
+        // this.players[player][indElim] = this.boardCtl.inactive[toChange][indElim];
         //redraw the board to reflect change.
         this.boardCtl.setupBoard();
     }
@@ -640,6 +644,8 @@ class MainController{
         let ind, player;
         let res =-1;
         for (let i of other){
+            //this.players isn't being mutated in the compareActiveOther function
+                //so I don't have to pass the actual reference.
             res = this.compareActiveOther(activeArr, this.players[i]);
             if (res !== undefined){
                 //if we don't get an undefined from compareActiveOther -> eliminate player
