@@ -398,9 +398,27 @@ class Quadrant{
     }
 
     removeHomeRules(){
-        this.illegalValues.absolute.pop();
+        // TODO: remove the restrictions for only the active Player and not others
         const toInsert = [[6,6,6,6], [8,6,8,6], [8,8,8,8], [6,8,6,8]];
-        this.illegalValues.absolute.push(toInsert);
+        // Before inserting, check for multiple entries
+        let absolute = this.illegalValues.absolute;
+        // Change the values of absoluteIllegal as long as multiple entries don't exist.
+        let insertBool = false;
+        // check for [6,6,8,8] which makes the whole homeBase illegal
+        let homeValue = [6,6,8,8];
+        // Search the absolute values for the homeBase values
+        absolute.forEach(el => {
+            // Use the string compare value since 2D arrays can't be compared without
+                // implementing a prototype
+            if (el.toString() === homeValue.toString()){
+                insertBool = true;
+            }
+        });
+        if (insertBool){
+            this.illegalValues.absolute.pop();
+            this.illegalValues.absolute.push(...toInsert);
+        }
+
     }
 
     goHome(x, y){
@@ -490,7 +508,8 @@ class MainController{
         // let playerArr = this.players[this.activePlayer];
         let index = this.getActiveName(this.activePlayer);
         let playerArr = this.boardCtl.coord[index];
-        this.boardCtl.coord[index] = playerArr.splice(ind, 1);
+        playerArr = playerArr.splice(ind, 1);
+        this.boardCtl.coord[index] = playerArr;
         // this.players[this.activePlayer] = playerArr.splice(ind, 1);
         console.log(this.players[this.activePlayer]);
         // Decrease number of pieces since the player has won and add it to count of
@@ -523,6 +542,7 @@ class MainController{
         for (let i=1; i<=item; i++){
             this.uiCtl.insertOptionItem(i, 'Move Piece');
             document.querySelector(this.uiCtl.DOMItems.controlOpt).addEventListener('click', () => {
+                console.log(`the value passed to roll as 'item' is ${4 - i}`);
                 this.movePlayer(roll, 4 - i);
                 this.uiCtl.clearControlItems();
             });
@@ -550,6 +570,9 @@ class MainController{
             if (this.quad.checkWon()) this.removeWonPlayer(player);
         }
         let index = this.getActiveName(this.activePlayer);
+        console.log(`moving the following indexed player ${index}`);
+        console.log(`the player value is ${player}`);
+        console.log(this.boardCtl.coord[index][player]);
         this.boardCtl.coord[index][player] = [dx, dy];
         this.boardCtl.setupBoard();
         this.checkElimination();
@@ -580,7 +603,6 @@ class MainController{
         this.uiCtl.displayPiecesCount(pieces);
         //Draw the board with a piece on the starting line
         let startCoord = this.boardCtl.startCoord[this.activePlayer];
-        console.log(`adding player at index ${pieces}`);
 
         // possible bug when referencing this.players as way to boardCtl instance.
         let index = this.getActiveName(this.activePlayer);
@@ -755,7 +777,7 @@ mainCtl.init();
 
 mainCtl.addPlayer();
 mainCtl.boardCtl.coord.green[3] = [0,7];
-mainCtl.quad.illegalValues.yellow = true;
+// mainCtl.quad.illegalValues.yellow = true;
 mainCtl.quad.illegalValues.green = true;
 mainCtl.diceRoll = 5;
 // mainCtl.quad.illegalValues['green'] = true;
