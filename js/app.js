@@ -777,7 +777,7 @@ mainCtl.init();
 
 mainCtl.addPlayer();
 mainCtl.boardCtl.coord.green[3] = [0,7];
-// mainCtl.quad.illegalValues.yellow = true;
+mainCtl.quad.illegalValues.yellow = true;
 mainCtl.quad.illegalValues.green = true;
 mainCtl.diceRoll = 5;
 // mainCtl.quad.illegalValues['green'] = true;

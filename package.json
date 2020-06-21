@@ -1,0 +1,25 @@
+{
+  "name": "ludogame",
+  "version": "1.0.0",
+  "description": "![Game Preview.png](./resources/gamepreview.png)",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "webpack --mode production"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/moehaemad/LudoGame.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/moehaemad/LudoGame/issues"
+  },
+  "homepage": "https://github.com/moehaemad/LudoGame#readme",
+  "devDependencies": {
+    "webpack": "^4.43.0",
+    "webpack-cli": "^3.3.12",
+    "webpack-dev-server": "^3.11.0"
+  }
+}
